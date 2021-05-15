@@ -1,0 +1,51 @@
+unit Connexion_Concerted_U;
+
+interface
+
+uses IdTCPServer, IdTCPClient, Type_U;
+
+type
+  TConnexion_Concerted = class(TObject)
+  private
+    procedure SetStateConnect(const Value: TStateConnect);
+  protected
+    FAThread: TIdPeerThread;
+    FIdTCPClient: TIdTCPClient;
+    FUnitObjets: TObject;
+    FStateConnect: TStateConnect;
+
+  public
+    constructor Create(VAThread: TIdPeerThread); virtual;
+    property AThread: TIdPeerThread read FAThread write FAThread;
+    property IdTCPClient: TIdTCPClient read FIdTCPClient write FIdTCPClient;
+    property UnitObjets: TObject read FUnitObjets write FUnitObjets;
+    property StateConnect: TStateConnect read FStateConnect write SetStateConnect; //    Õ«·… «·≈ ’«·
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses Classes_U;
+
+{ TConnexion }
+
+constructor TConnexion_Concerted.Create(VAThread: TIdPeerThread);
+begin
+  FAThread := VAThread;
+  FidTCPClient := TIdTCPClient.Create(nil);
+end;
+
+procedure TConnexion_Concerted.SetStateConnect(const Value: TStateConnect);
+begin
+  if FStateConnect = Value then Exit;
+  FStateConnect := Value;
+//  Change_ImageIndex;  // ·· ’ÕÌÕ ·«Õﬁ«
+end;
+
+destructor TConnexion_Concerted.Destroy;
+begin
+  TUnitObjets(FUnitObjets).Connexion := nil;
+  inherited;
+end;
+
+end.

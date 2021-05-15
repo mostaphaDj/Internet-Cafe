@@ -1,0 +1,50 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{083f6c03-1487-401e-b827-e9e391848e78}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="Server\Project\MyCafe_Server.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Client\Project\MyCafe_Client.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<BorlandProject>
+					<Default.Personality/>
+				</BorlandProject>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="MyCafe_Server">
+			<MSBuild Projects="Server\Project\MyCafe_Server.dproj"/>
+		</Target>
+		<Target Name="MyCafe_Server:Clean">
+			<MSBuild Targets="Clean" Projects="Server\Project\MyCafe_Server.dproj"/>
+		</Target>
+		<Target Name="MyCafe_Server:Make">
+			<MSBuild Targets="Make" Projects="Server\Project\MyCafe_Server.dproj"/>
+		</Target>
+		<Target Name="MyCafe_Client">
+			<MSBuild Projects="Client\Project\MyCafe_Client.dproj"/>
+		</Target>
+		<Target Name="MyCafe_Client:Clean">
+			<MSBuild Targets="Clean" Projects="Client\Project\MyCafe_Client.dproj"/>
+		</Target>
+		<Target Name="MyCafe_Client:Make">
+			<MSBuild Targets="Make" Projects="Client\Project\MyCafe_Client.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="MyCafe_Server;MyCafe_Client"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="MyCafe_Server:Clean;MyCafe_Client:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="MyCafe_Server:Make;MyCafe_Client:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>

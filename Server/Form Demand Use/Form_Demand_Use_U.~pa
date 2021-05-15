@@ -1,0 +1,36 @@
+unit Form_Demand_Use_U;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls;
+
+type
+  TForm_Demand_Use = class(TForm)
+    OK: TButton;
+    ButtonCancel: TButton;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    VarBool: Boolean;
+    procedure Form_Demand_Use_ShowModal;
+  end;
+
+var
+  Form_Demand_Use: TForm_Demand_Use;
+
+implementation
+
+{$R *.dfm}
+
+procedure TForm_Demand_Use.Form_Demand_Use_ShowModal;
+begin
+  if Form_Demand_Use.ShowModal = mrOK then VarBool := True
+  else VarBool := False;
+end;
+
+
+end.
+

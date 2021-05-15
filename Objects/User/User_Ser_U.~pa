@@ -1,0 +1,151 @@
+unit User_Ser_U;
+
+interface
+
+uses Forms, windows, Controls,
+  User_Concerted_U;
+
+type
+  TUser_Ser = class(TUser_Concerted)
+  private
+    procedure Setpseudonyme(const Value: ShortString); override;
+  protected
+
+  public
+    constructor Create(pseudonyme: string); override;
+    function Recording: Boolean; override; //    ÊÓÌíá (ÅäÔÇÁ ÍÓÇÈ ÌÏíÏ)
+    procedure Demand_Use; override; // ØáÈ  ÇáÅÊÕÇá
+  end;
+
+implementation
+
+uses SysUtils,
+  Data_Module_U, Use_Ser_U, Form_Demand_Use_U, Type_U;
+
+{ TUser_Ser }
+
+constructor TUser_Ser.Create(pseudonyme: string);
+begin
+  inherited;
+  if pseudonyme <> '' then
+  begin
+    with Data_Module do
+    begin
+      Table_User.Locate('pseudonyme', Fpseudonyme, []);
+      Fpseudonyme := Table_Userpseudonyme.Value; // ÅÓã  ÇáÏÎæá
+      FPrename := Table_UserPrenom.Value; // ÅÓã ÇáãÓÊÚãá
+      FRate := Table_Userrate.Value; //    ÊÕäíİ ÇáÒÈæä
+      FName := Table_UserNom.Value; // ÅÓã ÇáÚÆáÉ
+      FSexe := Table_UserSexe.Value; // ÇáÌäÓ
+      FPassword := Table_UserPassword.Value; // ßáãÉ ÇáãÑæÑ
+      FN_Carte := Table_UserN_Carte.Value; //   ÑŞã ÈØÇŞÉ ÇáÊÚÑíİ ÇáæØäí
+      FEmail := Table_UserEmail.Value; //  ÇáÈÑíÏ ÇáÅáßÊÑæäí
+      FAdresse := Table_UserAdresse.Value; //  ÇáÚäæÇä
+      FDateNescience := Table_UserDateNescience.Value; //  ÊÇÑíÎ ÇáãíáÇÏ
+      FComputation := Table_UserComputation.Value; //  ÇáÑÕíÏ Ãæ ÇáÏíä
+      FDate_Register := Table_UserDate_Register.Value; // ÊÇÑíÎ ÇáÊÓÌíá
+      FN_mobile := Table_UserN_mobile.Value; // ÇáåÇÊİ ÇáÌæÇá
+      FNiveau_Informatique := Table_UserNiveau_Informatique.Value; //  ÇáæÓÊæì İí ÇáÅÚáÇã ÇáÂáí
+      FVocation := Table_UserVocation.Value; // ; //   ÇáãåäÉ
+      FRemark := Table_UserRemark.Value; // ãáÇÍÖÉ Úä ÇáÒÈæä
+    end;
+  end;
+end;
+
+procedure TUser_Ser.Demand_Use;
+resourcestring
+  String_MessageDenial_Demand_Use = 'ÍĞË ÎØÃÁ ÚÏ ÅáÛÇÁ ØáÈ ÇáÌáÓÉ ÎØÃ İí ÇáÅÊÕÇá';
+begin
+  inherited;
+  Form_Demand_Use := TForm_Demand_Use.Create(Application);
+  if Form_Demand_Use.ShowModal = mrok then
+  begin
+    TUse_Ser(Use).Start;
+  end
+  else
+  begin
+    with FConnexion.IdTCPClient do
+    begin
+      try
+        Writeln('Denial_Demand_Use');
+      except
+        on E: Exception do
+        begin
+          MessageBox(Application.Handle, PChar(String_MessageDenial_Demand_Use + #13 + E.Message),
+            PChar(MsgCaptionError), $180000);
+        end;
+      end;
+    end;
+  end;
+end;
+
+function TUser_Ser.Recording: Boolean;
+var
+  VRecordUser: TRecordUser;
+begin
+  inherited Recording;
+
+  try
+    with FConnexion.AThread.Connection do
+    begin
+      ReadBuffer(VRecordUser, SizeOf(VRecordUser));
+      RecordUser := VRecordUser;
+    end;
+    with Data_Module do
+    begin
+      Table_User.Insert;
+      Table_Userpseudonyme.Value := Fpseudonyme; // ÅÓã  ÇáÏÎæá
+      Table_UserPrenom.Value := FPrename; // ÅÓã ÇáãÓÊÚãá
+      Table_Userrate.Value := FRate; //    ÊÕäíİ ÇáÒÈæä
+      Table_UserNom.Value := FName; // ÅÓã ÇáÚÆáÉ
+      Table_UserSexe.Value := FSexe; // ÇáÌäÓ
+      Table_UserPassword.Value := FPassword; // ßáãÉ ÇáãÑæÑ
+      Table_UserN_Carte.Value := FN_Carte; //   ÑŞã ÈØÇŞÉ ÇáÊÚÑíİ ÇáæØäí
+      Table_UserEmail.Value := FEmail; //  ÇáÈÑíÏ ÇáÅáßÊÑæäí
+      Table_UserAdresse.Value := FAdresse; //  ÇáÚäæÇä
+      Table_UserDateNescience.Value := FDateNescience; //  ÊÇÑíÎ ÇáãíáÇÏ
+      Table_UserComputation.Value := FComputation; //  ÇáÑÕíÏ Ãæ ÇáÏíä
+      Table_UserDate_Register.Value := FDate_Register; // ÊÇÑíÎ ÇáÊÓÌíá
+      Table_UserN_mobile.Value := FN_mobile; // ÇáåÇÊİ ÇáÌæÇá
+      Table_UserNiveau_Informatique.Value := FNiveau_Informatique; //  ÇáæÓÊæì İí ÇáÅÚáÇã ÇáÂáí
+      Table_UserVocation.Value := FVocation; // ; //   ÇáãåäÉ
+      Table_UserRemark.Value := FRemark; // ãáÇÍÖÉ Úä ÇáÒÈæä
+      Table_User.Post;
+    end;
+    Result := True;
+  except
+    Result := False;
+  end;
+end;
+
+procedure TUser_Ser.Setpseudonyme(const Value: ShortString);
+begin
+  inherited;
+  if pseudonyme <> '' then
+  begin
+    with Data_Module do
+    begin
+      Table_User.Locate('pseudonyme', Fpseudonyme, []);
+      Fpseudonyme := Table_Userpseudonyme.Value; // ÅÓã  ÇáÏÎæá
+      FPrename := Table_UserPrenom.Value; // ÅÓã ÇáãÓÊÚãá
+      FRate := Table_Userrate.Value; //    ÊÕäíİ ÇáÒÈæä
+      FName := Table_UserNom.Value; // ÅÓã ÇáÚÆáÉ
+      FSexe := Table_UserSexe.Value; // ÇáÌäÓ
+      FPassword := Table_UserPassword.Value; // ßáãÉ ÇáãÑæÑ
+      FN_Carte := Table_UserN_Carte.Value; //   ÑŞã ÈØÇŞÉ ÇáÊÚÑíİ ÇáæØäí
+      FEmail := Table_UserEmail.Value; //  ÇáÈÑíÏ ÇáÅáßÊÑæäí
+      FAdresse := Table_UserAdresse.Value; //  ÇáÚäæÇä
+      FDateNescience := Table_UserDateNescience.Value; //  ÊÇÑíÎ ÇáãíáÇÏ
+      FComputation := Table_UserComputation.Value; //  ÇáÑÕíÏ Ãæ ÇáÏíä
+      FDate_Register := Table_UserDate_Register.Value; // ÊÇÑíÎ ÇáÊÓÌíá
+      FN_mobile := Table_UserN_mobile.Value; // ÇáåÇÊİ ÇáÌæÇá
+      FNiveau_Informatique := Table_UserNiveau_Informatique.Value; //  ÇáæÓÊæì İí ÇáÅÚáÇã ÇáÂáí
+      FVocation := Table_UserVocation.Value; // ; //   ÇáãåäÉ
+      FRemark := Table_UserRemark.Value; // ãáÇÍÖÉ Úä ÇáÒÈæä
+    end;
+  end;
+
+end;
+
+end.
+

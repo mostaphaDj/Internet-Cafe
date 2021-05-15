@@ -1,0 +1,35 @@
+unit Frame_Recording3_U;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls;
+
+type
+  TFrame_Recording3 = class(TFrame)
+    Label1: TLabel;
+    ProgressBar1: TProgressBar;
+    Timer1: TTimer;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure Next; // «· Õﬁﬁ „‰ ’Õ… „⁄·Ê„«  «·„ﬂ Ê»… ﬁ»· «·„—Ê— ≈·Ï «·’›Õ… «·„Ê«·Ì…
+  end;
+
+implementation
+
+uses Char_U, Form_Welcoming_U, Type_U, Frame_Password_U;
+
+{$R *.dfm}
+
+{ TFrame_Recording3 }
+
+procedure TFrame_Recording3.Next;
+begin
+  Form_Welcoming.Notebook1.ActivePage := 'Page_Password';
+  Form_Welcoming.Frame_Password.RadioButton1.Enabled:=True;
+end;
+
+end.

@@ -1,0 +1,117 @@
+unit Connexion_Module_U;
+
+interface
+
+uses
+  SysUtils, windows, Forms, Classes, IdTCPServer, IdBaseComponent, IdComponent,
+  IdTCPConnection, IdTCPClient, IdAntiFreezeBase, IdAntiFreeze,
+  Data_Module_U, IdThreadMgr, IdThreadMgrDefault;
+type
+  TConnexion_Module = class(TDataModule)
+    IdTCPServer: TIdTCPServer;
+    IdAntiFreeze1: TIdAntiFreeze;
+    IdThreadMgrDefault1: TIdThreadMgrDefault;
+    procedure IdTCPServerExecute(AThread: TIdPeerThread);
+    procedure IdTCPServerDisconnect(AThread: TIdPeerThread);
+    procedure IdTCPServerConnect(AThread: TIdPeerThread);
+    procedure DataModuleCreate(Sender: TObject);
+  private
+    { DÈclarations privÈes }
+  public
+    { DÈclarations publiques }
+  end;
+
+var
+  Connexion_Module: TConnexion_Module;
+  ServerList: TList; //       ﬁ«∆„… «·”«—›Ê—«  «·„ ’·…
+  ServerMaster: TObject; //       «·”«—›Ê— «·—∆Ì”Ì «·„ Ê›— ⁄Ï ﬁ«⁄œ… »Ì«‰« 
+implementation
+
+uses Form_Main_U, Conect_Thead_U, Type_U, Connexion_Concerted_U, Classes_U;
+
+{$R *.dfm}
+
+procedure TConnexion_Module.IdTCPServerExecute(AThread: TIdPeerThread);
+var Command: string;
+begin
+  if not AThread.Terminated and AThread.Connection.Connected then
+  begin
+    with AThread.Connection do
+    begin
+      Command := ReadLn;
+      Form_Main.ListBox1.Items.Add(Command);
+      if Command = 'CreateUser' then
+      begin
+        UnitObjets_Active.User := TUser.Create(UnitObjets_Active, 'undefined');
+      end
+      else
+        if Command = 'CreateUse' then
+        begin
+          UnitObjets_Active.Use := TUse.Create(UnitObjets_Active.Post_Client, UnitObjets_Active.User, UnitObjets_Active);
+        end
+        else
+          if Command = 'Start' then
+          begin
+            UnitObjets_Active.Use.Start;
+          end
+          else
+            if Command = 'StopAndCancel' then
+              UnitObjets_Active.Use.StopAndCancel
+            else
+              if Command = 'Terminate' then
+                UnitObjets_Active.Use.Terminate
+              else
+                if Command = 'Change_Use_To' then
+//              UnitObjets_Active.Post_Client.Change_Use_To
+                else
+                  if Command = 'Change_Use_For' then
+//                UnitObjets_Active.Post_Client.Change_Use_For
+                  else
+                    if Command = 'Restart' then
+                      UnitObjets_Active.Post_Client.Restart
+                    else
+                      if Command = 'ShutDown' then
+                        UnitObjets_Active.Post_Client.ShutDown;
+    end;
+  end;
+end;
+
+procedure TConnexion_Module.IdTCPServerDisconnect(AThread: TIdPeerThread);
+begin
+  UnitObjets_Active.Post_Client.Connexion.idTCPClient.Disconnect;
+  Sleep(1000);
+  TConectThead.Create(False, UnitObjets_Active.Post_Client.Connexion.idTCPClient);
+  AThread.Data := nil; //Post_Client ·ﬂÌ ·« Ì „  Õ—Ì—
+end;
+
+procedure TConnexion_Module.IdTCPServerConnect(AThread: TIdPeerThread);
+//var
+//  PostIndex: Integer;
+begin
+
+  if UnitObjets_Active.Post_Client.Connexion.AThread <> AThread then
+  begin
+    UnitObjets_Active.Post_Client.Connexion.AThread := AThread; // ·„ ·‰ ÂÌ »⁄œ
+    AThread.Data := UnitObjets_Active;
+  end;
+
+{  PostIndex := Form_ListView_Post_Client.ChercherPostName(AThread.Connection.Socket.LocalName);
+  if PostIndex = -1 then
+  begin
+    TPost_Client_Ser.Create(AThread);
+  end
+  else
+  begin
+    TPost_Client_Ser(Form_ListView_Post_Client.ListView1.Items.Item[PostIndex].Data).AThread := AThread;
+    TPost_Client_Ser(Form_ListView_Post_Client.ListView1.Items.Item[PostIndex].Data).StateConnect := scConnected;
+    AThread.Data := TObject(Form_ListView_Post_Client.ListView1.Items.Item[PostIndex].data);
+  end;}
+end;
+
+procedure TConnexion_Module.DataModuleCreate(Sender: TObject);
+begin
+  UnitObjets_Active := TUnitObjets.Create(nil);
+end;
+
+end.
+

@@ -1,0 +1,179 @@
+unit User_Cli_U;
+
+interface
+
+uses windows, forms, User_Concerted_U, Type_U;
+
+type
+  TUser_Cli = class(TUser_Concerted)
+  private
+
+  protected
+
+  public
+    constructor Create(VUnitObjects: TObject; VPseudonyme: string); override;
+    class function Recording(VRUser: TRecordUser; VConnexion: TObject): Boolean; override; //     ”ÃÌ· (≈‰‘«¡ Õ”«» ÃœÌœ)
+    class function UsernameExists(VUsername: string; VConnexion: TObject): Boolean; override; // «· Õﬁﬁ „‰  Ê›— «”„ «·„” Œœ„
+    class function CheckPassword(VUsername: string; VPassword: string; VConnexion: TObject): Boolean; override; // «· Õﬁﬁ „‰ ’Õ… ﬂ·„… «·„—Ê—
+    class procedure Create_Use_User(VUnitObjects: TObject;VPseudonyme:String); override;
+    procedure Terminate; override; //  Ì‰ÂÏ
+    procedure Demand_Use; override; // ÿ·»  «·≈ ’«·
+  end;
+
+implementation
+
+uses SysUtils, Use_Cli_U, Form_Welcoming_U, IdTCPConnection,
+  Classes_U;
+
+class procedure TUser_Cli.Create_Use_User(VUnitObjects: TObject;VPseudonyme:String);
+resourcestring
+  String_MessageDemand_Use = ' ⁄–— ÿ·» «·Ã·”… Œÿ√›Ì «·≈ ’«·';
+begin
+  inherited;
+  with TUnitObjets(VUnitObjects).Connexion.IdTCPClient do
+  begin
+    try
+      Writeln('Create_Use_User');
+      Writeln(VPseudonyme);
+    except
+      on E: Exception do
+      begin
+        MessageBox(Application.Handle, PChar(String_MessageDemand_Use + #13 + E.Message),
+          PChar(MsgType), $180000);
+      end;
+    end;
+  end;
+end;
+
+procedure TUser_Cli.Demand_Use;
+resourcestring
+  String_MessageDemand_Use = ' ⁄–— ÿ·» «·Ã·”… Œÿ√›Ì «·≈ ’«·';
+begin
+  inherited;
+  with FConnexion.IdTCPClient do
+  begin
+    try
+      Writeln('Demand_Use');
+      Writeln(Pseudonyme);
+      Writeln(DateTimeToStr(UnitObjets_Active.Use.TimeDesired));
+    except
+      on E: Exception do
+      begin
+        MessageBox(Application.Handle, PChar(String_MessageDemand_Use + #13 + E.Message),
+          PChar(MsgType), $180000);
+      end;
+    end;
+  end;
+end;
+
+class function TUser_Cli.Recording(VRUser: TRecordUser; VConnexion: TObject): Boolean;
+resourcestring
+  String_MessageRecording = ' ⁄–— ≈ﬂ„«· «· ”ÃÌ· »”»» Œÿ√¡ ›Ì «·≈ ’«·';
+var
+  VRecordUser: TRecordUser;
+begin
+  inherited Recording(VRUser, VConnexion);
+  with TConnexion(VConnexion).IdTCPClient do
+  begin
+    try
+      Writeln('RecordingUser');
+      VRecordUser := VRUser; // ·· ’ÕÌÕ ·«Õﬁ«
+      WriteBuffer(VRecordUser, SizeOf(VRecordUser), True);
+      if ReadLn = 'True' then Result := True
+      else Result := False;
+
+    except
+      on E: Exception do
+      begin
+        Result := False;
+        MessageBox(Application.Handle, PChar(String_MessageRecording + #13 + E.Message),
+          PChar(MsgCaptionError), $180000);
+      end;
+    end;
+  end;
+end;
+
+class function TUser_Cli.UsernameExists(VUsername: string; VConnexion: TObject): Boolean; // «· Õﬁﬁ „‰  Ê›— «”„ «·„” Œœ„
+resourcestring
+  String_MessageUsername = ' ⁄–— «· Õﬁﬁ „‰  Ê›— «”„ «·„” Œœ„ »”»» Œÿ√ ›Ì «·≈ ’«· »«·„Œœ„';
+var
+  comond: string[5];
+begin
+  inherited UsernameExists(VUsername, VConnexion);
+  with UnitObjets_Active.Connexion.IdTCPClient do
+  begin
+    try
+      Writeln('UsernameExists');
+      Writeln(VUsername);
+      comond := ReadLn;
+      if comond = 'True' then
+        Result := True else
+        if comond = 'False' then
+          Result := False;
+    except
+      on E: Exception do
+      begin
+        MessageBox(Application.Handle, PChar(String_MessageUsername + #13 + E.Message),
+          PChar(MsgCaptionError), $180000);
+      end;
+    end;
+  end;
+end;
+
+class function TUser_Cli.CheckPassword(VUsername: string; VPassword: string; VConnexion: TObject): Boolean; // «· Õﬁﬁ „‰ ’Õ… ﬂ·„… «·„—Ê—
+resourcestring
+  String_MessagePassword = ' ⁄–— «· Õﬁﬁ „‰ ﬂ·„… «·„—Ê— »”»» Œÿ√ ›Ì «·« ’«· »«·„Œœ„';
+var
+  comond: string[5];
+begin
+  inherited CheckPassword(VUsername, VPassword, VConnexion);
+  with UnitObjets_Active.Connexion.IdTCPClient do
+  begin
+    try
+      Writeln('checkPassword');
+      Writeln(VPassword);
+      Writeln(VUsername);
+      comond := ReadLn;
+      if comond = 'True' then
+        Result := True else
+        if comond = 'False' then
+          Result := False;
+    except
+      on E: Exception do
+      begin
+        MessageBox(Application.Handle, PChar(String_MessagePassword + #13 + E.Message),
+          PChar(MsgCaptionError), $180000);
+      end;
+    end;
+  end;
+end;
+
+constructor TUser_Cli.Create(VUnitObjects: TObject; VPseudonyme: string);
+resourcestring
+  String_MessageUserCreate = ' ⁄–— «·≈ ’«· »«·„Œœ„';
+var
+  VRecordUser: TRecordUser;
+begin
+  inherited;
+  try
+    with UnitObjets_Active.Connexion.AThread.Connection do
+    begin
+      ReadBuffer(VRecordUser, SizeOf(VRecordUser));
+      RecordUser := VRecordUser;
+    end;
+  except
+    on E: Exception do
+    begin
+      MessageBox(Application.Handle, PChar(String_MessageUserCreate + #13 + E.Message),
+        PChar(MsgCaptionError), $180000);
+    end; //on E: Exception do
+  end;
+end;
+
+procedure TUser_Cli.Terminate;
+begin
+  inherited Terminate;
+
+end;
+
+end.

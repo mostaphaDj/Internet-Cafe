@@ -1,0 +1,116 @@
+object Form_Payment: TForm_Payment
+  Left = 305
+  Top = 140
+  AutoSize = True
+  BorderIcons = [biSystemMenu, biHelp]
+  BorderStyle = bsDialog
+  Caption = 'Form_Payment'
+  ClientHeight = 349
+  ClientWidth = 273
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poDesktopCenter
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel2: TPanel
+    Left = 0
+    Top = 277
+    Width = 273
+    Height = 31
+    Align = alTop
+    TabOrder = 1
+    object Label_Payment: TLabel
+      Left = 24
+      Top = 75
+      Width = 24
+      Height = 13
+      Caption = #1575#1604#1583#1601#1593
+    end
+    object Label10: TLabel
+      Left = 9
+      Top = 8
+      Width = 65
+      Height = 16
+      Caption = #1605#1576#1604#1594' '#1575#1604#1602#1576#1590
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Edit_Payment: TEdit
+      Left = 152
+      Top = 67
+      Width = 89
+      Height = 21
+      TabOrder = 0
+    end
+    object Edit_CostTotale: TEdit
+      Left = 131
+      Top = 4
+      Width = 136
+      Height = 24
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 1
+    end
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 308
+    Width = 273
+    Height = 41
+    Align = alTop
+    TabOrder = 0
+    object Ok: TButton
+      Left = 24
+      Top = 8
+      Width = 75
+      Height = 25
+      Caption = 'Ok'
+      ModalResult = 1
+      TabOrder = 0
+    end
+    object Cancel: TButton
+      Left = 176
+      Top = 8
+      Width = 75
+      Height = 25
+      Caption = 'Cancel'
+      ModalResult = 2
+      TabOrder = 1
+    end
+  end
+  inline Frame_Cost: TFrame_Cost
+    Left = 0
+    Top = 0
+    Width = 273
+    Height = 277
+    Align = alTop
+    AutoSize = True
+    TabOrder = 2
+    inherited ValueListEditor1: TValueListEditor
+      Width = 273
+      ColWidths = (
+        129
+        138)
+    end
+    inherited Panel10: TPanel
+      Width = 273
+    end
+    inherited Panel3: TPanel
+      Width = 273
+    end
+  end
+end

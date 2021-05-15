@@ -1,0 +1,158 @@
+unit User_Concerted_U;
+
+interface
+
+uses Type_U, Connexion_Concerted_U;
+
+type
+  TUser_Concerted = class(TObject)
+  private
+    function GetRecordUser: TRecordUser;
+    procedure SetRecordUser(const Value: TRecordUser);
+  protected
+    FComputation: Currency;
+    FN_Carte: Integer;
+    FPassword: ShortString;
+    FVocation: ShortString;
+    Fpseudonyme: ShortString;
+    FPrename: ShortString;
+    FNiveau_didacticism: ShortString;
+    FAdresse: ShortString;
+    FSexe: ShortString;
+    FEmail: ShortString;
+    FNiveau_Informatique: ShortString;
+    FName: ShortString;
+    FRemark: ShortString;
+    FDate_Register: TDateTime;
+    FDateNescience: TDateTime;
+    FRecordUser: TRecordUser;
+    FRate: ShortString;
+    FN_mobile: Integer;
+    FConnexion: TConnexion_Concerted;
+    FUnitObjets: TObject;
+    procedure Setpseudonyme(const Value: ShortString); virtual;
+  public
+    constructor Create(VUnitObjects: TObject; VPseudonyme: string); virtual;
+    class function Recording(VRUser: TRecordUser; VConnexion: TObject): Boolean; virtual; //     ”ÃÌ· (≈‰‘«¡ Õ”«» ÃœÌœ)
+    class function UsernameExists(VUsername: string; VConnexion: TObject): Boolean; virtual; // «· Õﬁﬁ „‰  Ê›— «”„ «·„” Œœ„
+    class function CheckPassword(VUsername: string; VPassword: string; VConnexion: TObject): Boolean; virtual; // «· Õﬁﬁ „‰ ’Õ… ﬂ·„… «·„—Ê—
+    class procedure Create_Use_User(VUnitObjects: TObject); virtual;
+    procedure Demand_Use; virtual; // ÿ·»  «·≈ ’«·
+    property Pseudonyme: ShortString read Fpseudonyme write Setpseudonyme; // «”„ «·œŒÊ·
+    property Prename: ShortString read FPrename write FPrename; // «·«”„
+    property Name: ShortString read FName write FName; // ≈”„ «·⁄∆·…
+    property Password: ShortString read FPassword write FPassword; // ≈”„ «·⁄∆·…
+    property Rate: ShortString read FRate; // ›∆… «·„” Œœ„ („” ÊÏ «· ’‰Ì› „‰ √Ã· «· ”⁄Ì—)
+    property Sexe: ShortString read FSexe write FSexe; // «·Ã‰”
+    property N_Carte: Integer read FN_Carte write FN_Carte; //   —ﬁ„ »ÿ«ﬁ… «· ⁄—Ì› «·Êÿ‰Ì
+    property Email: ShortString read FEmail write FEmail; //  «·»—Ìœ «·≈·ﬂ —Ê‰Ì
+    property Adresse: ShortString read FAdresse write FAdresse; //  «·⁄‰Ê«‰
+    property N_mobile: Integer read FN_mobile write FN_mobile; //  «·⁄‰Ê«‰
+    property DateNescience: TDateTime read FDateNescience write FDateNescience; //   «—ÌŒ «·„Ì·«œ
+    property Computation: Currency read FComputation write FComputation; //  «·—’Ìœ √Ê «·œÌ‰
+    property Date_Register: TDateTime read FDate_Register write FDate_Register; //  «—ÌŒ «· ”ÃÌ·
+    property Niveau_Informatique: ShortString read FNiveau_Informatique write FNiveau_Informatique; //  «·Ê” ÊÏ ›Ì «·≈⁄·«„ «·¬·Ì
+    property Niveau_didacticism: ShortString read FNiveau_didacticism write FNiveau_didacticism; //  «·Ê” ÊÏ ›Ì «·≈⁄·«„ «·¬·Ì
+    property Vocation: ShortString read FVocation write FVocation; //   «·„Â‰…
+    property Remark: ShortString read FRemark write FRemark; // „·«Õ÷… ⁄‰ «·“»Ê‰
+    property RecordUser: TRecordUser read GetRecordUser write SetRecordUser; //
+    property Connexion: TConnexion_Concerted read FConnexion write FConnexion;
+    property UnitObjets: TObject read FUnitObjets write FUnitObjets;
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses Classes_U;
+
+{ TUser }
+
+class function TUser_Concerted.CheckPassword(VUsername: string; VPassword: string; VConnexion: TObject): Boolean; // «· Õﬁﬁ „‰ ’Õ… ﬂ·„… «·„—Ê—
+begin
+
+end;
+
+constructor TUser_Concerted.Create(VUnitObjects: TObject; VPseudonyme: string);
+begin
+  FPseudonyme := VPseudonyme;
+  FUnitObjets := VUnitObjects;
+  TUnitObjets(FUnitObjets).User := self;
+end;
+
+class procedure TUser_Concerted.Create_Use_User(VUnitObjects: TObject);
+begin
+
+end;
+
+procedure TUser_Concerted.Demand_Use;
+begin
+
+end;
+
+destructor TUser_Concerted.Destroy;
+begin
+  TUnitObjets(FUnitObjets).User := nil;
+  inherited;
+end;
+
+function TUser_Concerted.GetRecordUser: TRecordUser;
+begin
+  with FRecordUser do
+  begin
+    pseudonyme := Fpseudonyme; // ≈”„  «·œŒÊ·
+    Prename := FPrename; // ≈”„ «·„” ⁄„·
+    Name := FName; // ≈”„ «·⁄∆·…
+    Sexe := FSexe; // «·Ã‰”
+    Password := FPassword; // ﬂ·„… «·„—Ê—
+    N_Carte := FN_Carte; //   —ﬁ„ »ÿ«ﬁ… «· ⁄—Ì› «·Êÿ‰Ì
+    Email := FEmail; //  «·»—Ìœ «·≈·ﬂ —Ê‰Ì
+    Adresse := FAdresse; //  «·⁄‰Ê«‰
+    DateNescience := FDateNescience; //   «—ÌŒ «·„Ì·«œ
+    Computation := FComputation; //  «·—’Ìœ √Ê «·œÌ‰
+    Date_Register := FDate_Register; //  «—ÌŒ «· ”ÃÌ·
+    N_mobile := FN_mobile; // «·Â« › «·ÃÊ«·
+    Niveau_Informatique := FNiveau_Informatique; //  «·Ê” ÊÏ ›Ì «·≈⁄·«„ «·¬·Ì
+    Niveau_didacticism := FNiveau_didacticism; //  //  «·Ê” ÊÏ ›Ì «·≈⁄·«„ «·¬·Ì
+    Vocation := FVocation; // ; //   «·„Â‰…
+    Remark := FRemark; // „·«Õ÷… ⁄‰ «·“»Ê‰
+  end;
+  Result := FRecordUser;
+end;
+
+class function TUser_Concerted.Recording(VRUser: TRecordUser; VConnexion: TObject): Boolean;
+begin
+
+end;
+
+procedure TUser_Concerted.Setpseudonyme(const Value: ShortString);
+begin
+  if Fpseudonyme = Value then Exit;
+  Fpseudonyme := Value;
+end;
+
+procedure TUser_Concerted.SetRecordUser(const Value: TRecordUser);
+begin
+  Fpseudonyme := Value.pseudonyme; // ≈”„  «·œŒÊ·
+  FPrename := Value.Prename; // ≈”„ «·„” ⁄„·
+  FName := Value.Name; // ≈”„ «·⁄∆·…
+  FSexe := Value.Sexe; // «·Ã‰”
+  FPassword := Value.Password; // ﬂ·„… «·„—Ê—
+  FN_Carte := Value.N_Carte; //   —ﬁ„ »ÿ«ﬁ… «· ⁄—Ì› «·Êÿ‰Ì
+  FEmail := Value.Email; //  «·»—Ìœ «·≈·ﬂ —Ê‰Ì
+  FAdresse := Value.Adresse; //  «·⁄‰Ê«‰
+  FDateNescience := Value.DateNescience; //   «—ÌŒ «·„Ì·«œ
+  FComputation := Value.Computation; //  «·—’Ìœ √Ê «·œÌ‰
+  FDate_Register := Value.Date_Register; //  «—ÌŒ «· ”ÃÌ·
+  FN_mobile := Value.N_mobile; // «·Â« › «·ÃÊ«·
+  FNiveau_Informatique := Value.Niveau_Informatique; //  «·Ê” ÊÏ ›Ì «·≈⁄·«„ «·¬·Ì
+  FNiveau_didacticism := Value.Niveau_didacticism; // ; //  «·Ê” ÊÏ ›Ì «·≈⁄·«„ «·¬·Ì
+  FVocation := Value.Vocation; // ; //   «·„Â‰…
+  FRemark := Value.Remark; // „·«Õ÷… ⁄‰ «·“»Ê‰
+end;
+
+class function TUser_Concerted.UsernameExists(VUsername: string; VConnexion: TObject): Boolean;
+begin
+
+end;
+
+end.

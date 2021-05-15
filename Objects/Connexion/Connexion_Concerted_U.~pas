@@ -1,0 +1,66 @@
+unit Connexion_Concerted_U;
+
+interface
+
+uses IdTCPServer, IdUDPClient, IdTCPClient, Type_U;
+
+type
+  TConnexion_Concerted = class(TObject)
+  private
+    procedure SetStateConnect(const Value: TStateConnect);
+  protected
+    FAThread: TIdPeerThread;
+    FIdTCPClient: TIdTCPClient;
+    FIdUDPClient: TIdUDPClient;
+    FPassword_UDP: string;
+    FUnitObjets: TObject;
+    FStateConnect: TStateConnect;
+
+  public
+    constructor Create; virtual;
+    procedure Connect(VHost: string); virtual;
+    property AThread: TIdPeerThread read FAThread write FAThread;
+    property IdTCPClient: TIdTCPClient read FIdTCPClient write FIdTCPClient;
+    property IdUDPClient: TIdUDPClient read FIdUDPClient write FIdUDPClient;
+    property Password_UDP: string read FPassword_UDP write FPassword_UDP;
+    property UnitObjets: TObject read FUnitObjets write FUnitObjets;
+    property StateConnect: TStateConnect read FStateConnect write SetStateConnect; //    Õ«·… «·≈ ’«·
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses Classes_U;
+
+{ TConnexion }
+
+constructor TConnexion_Concerted.Create;
+begin
+
+end;
+
+procedure TConnexion_Concerted.SetStateConnect(const Value: TStateConnect);
+begin
+  if FStateConnect = Value then Exit;
+  FStateConnect := Value;
+//  Change_ImageIndex;  // ·· ’ÕÌÕ ·«Õﬁ«
+end;
+
+destructor TConnexion_Concerted.Destroy;
+begin
+  TUnitObjets(FUnitObjets).Connexion := nil;
+  inherited;
+end;
+
+procedure TConnexion_Concerted.Connect(VHost: string);
+begin
+  UnitObjets_Active.Post_Client.HostName := VHost;
+  FIdTCPClient.Host := VHost;
+  TConectThead.Create(False, IdTCPClient);
+
+  TUnitObjets(ListUnitObjets.Items[PostIndex]).Connexion.StateConnect := scConnected; //  ·· ’ÕÌÕ ·«Õﬁ«
+  TUnitObjets(ListUnitObjets.Items[PostIndex]).Post_Client.StateLock := slUnLock; //  ·· ’ÕÌÕ ·«Õﬁ«
+end;
+
+end.
+

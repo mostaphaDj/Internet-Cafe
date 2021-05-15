@@ -1,0 +1,51 @@
+object Connexion_Module: TConnexion_Module
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Left = 250
+  Top = 515
+  Height = 175
+  Width = 309
+  object IdTCPServer: TIdTCPServer
+    Active = True
+    Bindings = <>
+    CommandHandlers = <>
+    DefaultPort = 6000
+    Greeting.NumericCode = 0
+    MaxConnectionReply.NumericCode = 0
+    OnConnect = IdTCPServerConnect
+    OnExecute = IdTCPServerExecute
+    OnDisconnect = IdTCPServerDisconnect
+    ReplyExceptionCode = 0
+    ReplyTexts = <>
+    ReplyUnknownCommand.NumericCode = 0
+    ThreadMgr = IdThreadMgrDefault
+    Left = 40
+    Top = 16
+  end
+  object IdAntiFreeze: TIdAntiFreeze
+    IdleTimeOut = 50
+    OnlyWhenIdle = False
+    Left = 40
+    Top = 80
+  end
+  object IdThreadMgrDefault: TIdThreadMgrDefault
+    Left = 136
+    Top = 80
+  end
+  object IdUDPServer: TIdUDPServer
+    Active = True
+    Bindings = <>
+    DefaultPort = 6002
+    OnUDPRead = IdUDPServerUDPRead
+    Left = 136
+    Top = 16
+  end
+  object IdUDPClient: TIdUDPClient
+    Active = True
+    BroadcastEnabled = True
+    Host = '255.255.255.255'
+    Port = 6003
+    Left = 232
+    Top = 16
+  end
+end

@@ -1,0 +1,113 @@
+unit Use_Account_U;
+
+interface
+
+uses Round_U;
+
+type
+  TUse_Account = class(TObject)
+  private
+    procedure SetTimeFinVirtual(const Value: TDateTime);
+    procedure SetTimeDesired(const Value: TDateTime);
+    procedure SetCostVirtual(const Value: Currency);
+
+  protected
+    FTimeDesired: TDateTime; //   «·Êﬁ  «·„ÿ·Ê»
+    FTimeStart: TDateTime;
+    FTimeFinVirtual: TDateTime;
+    FCostVirtual: Currency;
+    FPriceHour: Currency;
+    FRound: TRound;
+
+    function AccountTimeUtilizeWhomCost: TDateTime; //  Õ”«» „œ… «·Ã·”… „‰ «·„»·€
+    function AccountTimeUtilizeWhomTimeFin(TimeFin: TDateTime): TDateTime; //  Õ”«» „œ… «·Ã·”… „‰ Êﬁ  ≈‰ Â«¡ «·Ã·”…
+    function AccountTimeFin: TDateTime; // Õ”«» Êﬁ  ≈‰ Â«¡ «·Ã·”…
+    function AccountCost(TimeUtilize: TDateTime): Currency; // Õ”«» «·„»·€
+  public
+    property TimeFinVirtual: TDateTime read FTimeFinVirtual write SetTimeFinVirtual; // Êﬁ  «·«‰ Â«¡ «·„› —÷
+    property TimeDesired: TDateTime read FTimeDesired write SetTimeDesired; //   «·Êﬁ  «·„ÿ·Ê»
+    property PriceHour: Currency read FPriceHour write FPriceHour; {À„‰ «·”«⁄…}
+    property CostVirtual: Currency read FCostVirtual write SetCostVirtual; {«·„»·€ «·„› —÷}
+    constructor Create; // „·«Õ÷… ÌÃ» «·Õ–— »⁄œ„ «” ⁄„«· Â–Â «·œ«·… ≈·« ›Ì Â–« «·ﬂ«∆‰
+                             // Ê·” ›Ì «·ﬂ«∆‰«  „Ê—À… „‰Â
+//  destructor Destroy; override;
+  end;
+
+
+implementation
+
+uses DateUtils, SysUtils, Classes_U;
+
+function TUse_Account.AccountCost(TimeUtilize: TDateTime): Currency; // Õ”«» «·„»·€
+begin
+  Result := FRound.Round((FPriceHour * MinuteOfTheDay(TimeUtilize)) / 60);
+end;
+
+function TUse_Account.AccountTimeFin: TDateTime; // Õ”«» Êﬁ  ≈‰ Â«¡ «·Ã·”…
+begin
+  Result := FTimeStart + FTimeDesired;
+end;
+
+function TUse_Account.AccountTimeUtilizeWhomCost: TDateTime; //  Õ”«» „œ… «·Ã·”… „‰ «·„»·€
+var
+  Hour: Integer;
+  TimeUtilizeOfMinute: Integer;
+begin
+  if FPriceHour <> 0 then
+  begin
+    TimeUtilizeOfMinute := System.Round((60 * FCostVirtual) / FPriceHour);
+    Hour := TimeUtilizeOfMinute div 60;
+    if Hour <> 0 then
+    begin
+      Result := StrToDateTime(IntToStr(Hour) + ':' + IntToStr(TimeUtilizeOfMinute - (Hour * 60)) + ':' + '00');
+    end
+    else
+    begin
+      Result := StrToDateTime('00' + ':' + IntToStr(TimeUtilizeOfMinute) + ':' + '00');
+    end;
+  end
+  else
+  begin
+    Result := StrToDateTime('00' + ':' + '00' + ':' + '00');
+  end;
+
+end;
+
+function TUse_Account.AccountTimeUtilizeWhomTimeFin(TimeFin: TDateTime): TDateTime; //  Õ”«» „œ… «·Ã·”… „‰ Êﬁ  ≈‰ Â«¡ «·Ã·”…
+begin
+  Result := TimeFin - FTimeStart; //+ StrToTime('00:01:00');
+end;
+
+procedure TUse_Account.SetTimeFinVirtual(const Value: TDateTime);
+begin
+  if FTimeFinVirtual = Value then Exit;
+  FTimeFinVirtual := Value;
+  FTimeDesired := AccountTimeUtilizeWhomTimeFin(FTimeFinVirtual);
+  FCostVirtual := AccountCost(FTimeDesired);
+end;
+
+procedure TUse_Account.SetCostVirtual(const Value: Currency);
+begin
+  if FCostVirtual = Value then Exit;
+  FCostVirtual := Value;
+  FTimeDesired := AccountTimeUtilizeWhomCost;
+  FTimeFinVirtual := AccountTimeFin;
+end;
+
+procedure TUse_Account.SetTimeDesired(const Value: TDateTime);
+begin
+  if FTimeDesired = Value then Exit;
+  FTimeDesired := Value;
+  FCostVirtual := AccountCost(FTimeDesired);
+  FTimeFinVirtual := AccountTimeFin;
+end;
+
+constructor TUse_Account.Create;
+begin
+  FRound := TRound.Create;
+  FTimeStart := Now;
+end;
+
+end.
+
+ 

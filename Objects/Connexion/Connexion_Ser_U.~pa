@@ -1,0 +1,43 @@
+unit Connexion_Ser_U;
+
+interface
+
+uses Connexion_Concerted_U, IdTCPServer;
+
+type
+  TConnexion_Ser = class(TConnexion_Concerted)
+  private
+  protected
+
+  public
+    constructor Create(VAThread: TIdPeerThread); override;
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses Type_U;
+
+{ TConnexion_Ser }
+
+constructor TConnexion_Ser.Create(VAThread: TIdPeerThread);
+begin
+  inherited;
+  with FIdTCPClient do
+  begin
+    Port := 6001;
+    try
+      Connect;
+      FStateConnect := scConnected;
+    except
+    end;
+  end;
+end;
+
+destructor TConnexion_Ser.Destroy;
+begin
+
+  inherited;
+end;
+
+end.

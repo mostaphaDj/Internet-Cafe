@@ -1,0 +1,143 @@
+object Frame_Cost: TFrame_Cost
+  Left = 0
+  Top = 0
+  Width = 443
+  Height = 277
+  Align = alTop
+  AutoSize = True
+  TabOrder = 0
+  object ValueListEditor1: TValueListEditor
+    Left = 0
+    Top = 76
+    Width = 443
+    Height = 177
+    Align = alBottom
+    DisplayOptions = [doAutoColResize, doKeyColFixed]
+    ScrollBars = ssNone
+    Strings.Strings = (
+      'TimeStart='
+      'TimeNow='
+      'TimeUtilize='
+      'TimeDesired='
+      'TimeFinVirtual='
+      'CostVirtual='
+      'PriceHour='
+      'Cost='
+      'Computation=')
+    TabOrder = 0
+    Visible = False
+    OnEditButtonClick = ValueListEditor1EditButtonClick
+    ColWidths = (
+      129
+      308)
+  end
+  object Panel10: TPanel
+    Left = 0
+    Top = 253
+    Width = 443
+    Height = 24
+    Align = alBottom
+    BevelInner = bvRaised
+    Ctl3D = True
+    ParentCtl3D = False
+    TabOrder = 1
+    OnClick = Panel10Click
+    object Label3: TLabel
+      Left = 4
+      Top = 4
+      Width = 87
+      Height = 16
+      Caption = #1575#1604#1605#1576#1604#1594' '#1575#1604#1573#1580#1605#1575#1604#1610
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clRed
+      Font.Height = -13
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentFont = False
+      OnClick = Panel10Click
+    end
+    object Label_Totale: TLabel
+      Left = 135
+      Top = 4
+      Width = 93
+      Height = 16
+      Caption = 'Label_Totale'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clRed
+      Font.Height = -13
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentFont = False
+      OnClick = Panel10Click
+    end
+  end
+  object Panel3: TPanel
+    Left = 0
+    Top = 0
+    Width = 443
+    Height = 76
+    Align = alBottom
+    TabOrder = 2
+    object Label_pseudonyme_User: TLabel
+      Left = 131
+      Top = 24
+      Width = 120
+      Height = 13
+      Caption = 'Label_pseudonyme_User'
+    end
+    object Label_HostName_PC: TLabel
+      Left = 131
+      Top = 8
+      Width = 102
+      Height = 13
+      Caption = 'Label_HostName_PC'
+    end
+    object Label7: TLabel
+      Left = 12
+      Top = 24
+      Width = 51
+      Height = 13
+      Caption = #1575#1587#1605' '#1575#1604#1583#1582#1608#1604
+    end
+    object Label9: TLabel
+      Left = 12
+      Top = 8
+      Width = 56
+      Height = 13
+      Caption = 'Poste name'
+    end
+    object Label1: TLabel
+      Left = 12
+      Top = 40
+      Width = 61
+      Height = 13
+      Caption = #1575#1587#1605' '#1575#1604#1605#1587#1578#1582#1583#1605
+    end
+    object Label_Prename_User: TLabel
+      Left = 131
+      Top = 40
+      Width = 102
+      Height = 13
+      Caption = 'Label_Prename_User'
+    end
+    object Label6: TLabel
+      Left = 12
+      Top = 56
+      Width = 60
+      Height = 13
+      Caption = #1604#1602#1576' '#1575#1604#1605#1587#1578#1582#1583#1605
+    end
+    object Label_name_User: TLabel
+      Left = 131
+      Top = 56
+      Width = 86
+      Height = 13
+      Caption = 'Label_name_User'
+    end
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    Left = 240
+    Top = 80
+  end
+end

@@ -1,0 +1,107 @@
+unit Type_U;
+
+interface
+
+uses Windows;
+
+type
+  TStateTime = (stTimeUnlimited {Êﬁ  €Ì— „ÕœÊœ}, stTimelimited {Êﬁ  „Õœœ}); // Õ«·… «·Ã·”…
+  TStateLock = (slLock {„€·ﬁ}, slUnLock {„› ÊÕ});
+  TStateConnect = (scConnected {„ ’·}, scDisconnect {«‰ﬁÿ«⁄ „ÃÂÊ·}, scShutDown, scReturn); // Ê÷⁄Ì… «·≈ ’«·
+
+  TRecordUser = packed record
+    pseudonyme: string[15]; // ≈”„  «·œŒÊ·
+    Prename: string[15]; // ≈”„ «·„” ⁄„·
+    Name: string[15]; // ≈”„ «·⁄∆·…
+    Sexe: string[4]; // «·Ã‰”
+    Password: string[15]; // ﬂ·„… «·„—Ê—
+    N_Carte: Integer; //   —ﬁ„ »ÿ«ﬁ… «· ⁄—Ì› «·Êÿ‰Ì
+    Email: string[30]; //  «·»—Ìœ «·≈·ﬂ —Ê‰Ì
+    Adresse: string[250]; //  «·⁄‰Ê«‰
+    DateNescience: TDateTime; //   «—ÌŒ «·„Ì·«œ
+    Computation: Currency; //  «·—’Ìœ √Ê «·œÌ‰
+    Rate: string[30]; //  ’‰Ì› «·“»Ê‰
+    Date_Register: TDateTime; //  «—ÌŒ «· ”ÃÌ·
+    N_mobile: Integer; // «·Â« › «·ÃÊ«·
+    Niveau_Informatique: string[15]; //  «·Ê” ÊÏ ›Ì «·≈⁄·«„ «·¬·Ì
+    Niveau_didacticism: string[15]; //   «·„” ÊÏ «· ⁄·Ì„Ì
+    Vocation: string[30]; //   «·„Â‰…
+    Remark: string[250]; // „·«Õ÷… ⁄‰ «·“»Ê‰
+  end;
+
+  TRecordUse = packed record
+    N_Use: Integer; {—ﬁ„ «·Ã·”…}
+    Post_Client: TObject;
+    User: TObject; {«”„ «·„” Œœ„}
+    PriceHour: Currency; {À„‰ «·”«⁄…}
+    TimeStart: TDateTime; //default Now;{Êﬁ  »œ¡ «·Ã·”…}
+    TimeFin: TDateTime; // Êﬁ  ≈‰Â«¡ «·Ã·”…
+    TimeFinVirtual: TDateTime; // Êﬁ  ≈‰Â«¡ «·Ã·”…
+    TimeUtilize: TDateTime; //      {«·Êﬁ  «·„” Œœ„}
+    TimeDesired: TDateTime; //   «·Êﬁ  «·„ÿ·Ê»
+    CostVirtual: Currency; {«·„»·€ «·„› —÷}
+    Cost: Currency; {«·„»·€}
+    StateTime: TStateTime; {«·Ê÷⁄Ì…}
+  end;
+
+  TRecordRound = packed record
+    Value: Currency; // «·„»·€
+    ValueRound: Currency; // «·„»·€ «·„—ÃÕ
+    UnitRound: Currency; //ﬁÌ„… «· —ÃÌÕ
+    ValueNiveauRound: Currency; //ﬁÌ„… «ﬁ· Õ”«—…
+    PercentageNiveauRound: Single; // ‰”»… √ﬁ· Œ”«—…
+  end;
+
+  TRecordPost_Client = packed record
+    HostName:string[63];
+    IPAddress: string[15];
+  end;
+
+
+function StateTimeToString(Value: TStateTime): string;
+function StringToStateTime(Value: string): TStateTime;
+
+function StateLockToString(Value: TStateLock): string;
+function StringToStateLock(Value: string): TStateLock;
+
+//function StateUseToString(Value: TStateUse): string;
+//function StringToStateUse(Value: string): TStateUse;
+
+
+const
+  MsgType: Integer = MB_ICONSTOP + MB_DEFBUTTON1 + MB_SYSTEMMODAL + MB_RIGHT + MB_RTLREADING;
+  MsgCaptionError = 'Œÿ√';
+  MsgCaptionWarning = ' Õ–Ì—';
+
+implementation
+
+function StateTimeToString(Value: TStateTime): string;
+begin
+  case Value of
+    stTimeUnlimited: Result := 'stTimeUnlimited';
+    stTimelimited: Result := 'stTimelimited';
+  end;
+end;
+
+function StringToStateTime(Value: string): TStateTime;
+begin
+  if Value = 'stTimeUnlimited' then Result := stTimeUnlimited else
+    if Value = 'stTimelimited' then Result := stTimelimited;
+end;
+
+function StateLockToString(Value: TStateLock): string;
+begin
+  case Value of
+    slLock: Result := 'slLock';
+    slUnLock: Result := 'slUnLock';
+  end;
+end;
+
+function StringToStateLock(Value: string): TStateLock;
+begin
+  if Value = 'slLock' then Result := slLock else
+    if Value = 'slUnLock' then Result := slUnLock;
+end;
+
+end.
+

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<TgConfig Version="3" SubLevelDisabled="False">
+  <Option Name="namespaceFolder.Classes_U" Type="System.String" Value="Classes_U" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.Connexion_Concerted_U" Type="System.String" Value="Connexion_Concerted_U" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.Connexion_Module_U" Type="System.String" Value="Connexion_Module_U" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.Connexion_Ser_U" Type="System.String" Value="Connexion_Ser_U" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.Rate_U" Type="System.String" Value="Rate_U" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.Post_Client_Concerted_U" Type="System.String" Value="Post_Client_Concerted_U" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.FrameRound_U" Type="System.String" Value="FrameRound_U" Category="General" IsBrowsable="False" />
+</TgConfig>

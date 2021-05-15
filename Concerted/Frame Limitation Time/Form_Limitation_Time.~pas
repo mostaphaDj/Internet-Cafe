@@ -1,0 +1,27 @@
+unit Form_UnLockPartTime_U;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Frame_Limitation_Time_U;
+
+type
+  TForm_Limitation_Time = class(TForm)
+    Button1: TButton;
+    Button2: TButton;
+    Frame_Limitation_Time: TFrame_Limitation_Time;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form_Limitation_Time: TForm_Limitation_Time;
+
+implementation
+
+{$R *.dfm}
+
+end.

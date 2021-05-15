@@ -1,0 +1,19 @@
+unit Classes_U;
+
+interface
+
+Uses UnitObjets_Ser_U,Post_Client_Ser_U,User_Ser_U,Use_Ser_U,Connexion_Ser_U;
+
+//  ÊÕÑíÍ ÈÇÓãÇÁ ÌÏíÏÉ ááÇÕäÇİ
+// ãä ÇÌá ÇÓÊÚÇá äİÓ ÇáßæÏ İí ÇáÈÑäÇãÌíä
+
+Type
+TUnitObjets=TUnitObjets_Ser;
+TPost_Client=TPost_Client_Ser;
+TUser=TUser_Ser;
+TUse=TUse_Ser;
+TConnexion=TConnexion_Ser;
+
+implementation
+
+end.

@@ -1,0 +1,181 @@
+unit Frame_Recording2_U;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls;
+
+type
+  TFrame_Recording2 = class(TFrame)
+    Label3: TLabel;
+    ComboBox1: TComboBox;
+    Label1: TLabel;
+    ComboBox2: TComboBox;
+    Label2: TLabel;
+    Edit_Adresse: TEdit;
+    Edit_N_mobile: TEdit;
+    Label_N_Telephone: TLabel;
+    Label_Sexe: TLabel;
+    ComboBox_Sexe: TComboBox;
+    Label_Adresse: TLabel;
+    Label_Date_de_Neconce: TLabel;
+    DateTimePicker_Date_DateNescience: TDateTimePicker;
+    Bevel1: TBevel;
+    Image1: TImage;
+    Image2: TImage;
+    Image3: TImage;
+    Image4: TImage;
+    Image5: TImage;
+    ImageTelephone: TImage;
+    ImageAdresse: TImage;
+    Image7: TImage;
+    Image8: TImage;
+    ImageSexe: TImage;
+    ImageDate_DateNescience: TImage;
+    procedure Edit_N_mobileExit(Sender: TObject);
+    procedure Edit_N_mobileKeyPress(Sender: TObject; var Key: Char);
+    procedure Edit_AdresseExit(Sender: TObject);
+    procedure ComboBox_SexeExit(Sender: TObject);
+    procedure ComboBox1Exit(Sender: TObject);
+    procedure ComboBox2Exit(Sender: TObject);
+    procedure DateTimePicker_Date_DateNescienceExit(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure Next; // «· Õﬁﬁ „‰ ’Õ… „⁄·Ê„«  «·„ﬂ Ê»… ﬁ»· «·„—Ê— ≈·Ï «·’›Õ… «·„Ê«·Ì…
+    procedure Prior; // ··Œ·›
+  end;
+
+implementation
+
+uses Char_U, Form_Welcoming_U, Type_U, Classes_U;
+
+{$R *.dfm}
+
+{ TFrame_Recording2 }
+
+procedure TFrame_Recording2.Next;
+resourcestring
+  MsgText7 = '—ﬁ„ «·Â« › ·«Ìﬁ· ⁄‰ 9 √—ﬁ«„';
+var
+  VRecordUser: TRecordUser;
+begin
+  if (Length(Edit_N_mobile.Text) = 9) or (Edit_N_mobile.Text = '') then
+  begin
+    Form_Welcoming.Button_Next.Enabled := False;
+    Form_Welcoming.Button_Prior.Enabled := False;
+    VRecordUser.DateNescience := DateTimePicker_Date_DateNescience.DateTime;
+    VRecordUser.N_mobile := StrToIntDef(Edit_N_mobile.Text, 0);
+    VRecordUser.Adresse := Edit_Adresse.Text;
+    VRecordUser.sexe := ComboBox_Sexe.Text;
+    VRecordUser.Niveau_didacticism := ComboBox1.Text;
+    VRecordUser.Niveau_Informatique := ComboBox2.Text;
+    VRecordUser.Date_Register := Now;
+    VRecordUser.Computation := 0;
+    Form_Welcoming.Notebook1.ActivePage := 'Page_Recording3';
+    if UnitObjets_Active.User.Recording(VRecordUser, UnitObjets_Active.Connexion) then
+    begin
+      Form_Welcoming.Frame_Recording3.Label1.Caption := ' „ «· ”ÃÌ· »‰Ã«Õ ≈‰ﬁ— ⁄·Ï «· «·Ì ··„ «»⁄…';
+      Form_Welcoming.Button_Next.Enabled := True;
+    end
+    else
+    begin
+      Form_Welcoming.Frame_Recording3.Label1.Caption := '›‘· «· ”ÃÌ·';
+      Form_Welcoming.Button_Prior.Enabled := True;
+    end;
+  end
+  else
+  begin
+    MessageBox(Application.Handle, PChar(MsgText7), PChar(MsgCaptionError), MB_OK + MsgType);
+    Form_Welcoming.ActiveControl := Edit_N_mobile;
+  end;
+end;
+
+procedure TFrame_Recording2.Edit_N_mobileExit(Sender: TObject);
+begin
+  if Edit_N_mobile.Text <> '' then
+  begin
+    if Length(Edit_N_mobile.Text) = 9 then
+    begin
+      ImageTelephone.Picture := Form_Welcoming.ImageTrue.Picture;
+    end
+    else
+    begin
+      ImageTelephone.Picture := Form_Welcoming.ImageFalse.Picture;
+    end;
+    ImageTelephone.Visible := True;
+  end
+  else ImageTelephone.Visible := False;
+end;
+
+procedure TFrame_Recording2.Edit_N_mobileKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+  if not CharNumber(Key) then
+  begin
+    key := #0;
+    Form_Welcoming.Label_Message.Left := TWinControl(Sender).Left + Form_Welcoming.Notebook1.Left + 8;
+    Form_Welcoming.Label_Message.Top := TWinControl(Sender).Top + 8 + 22;
+    Form_Welcoming.Label_Message.Visible := True;
+  end else Form_Welcoming.Label_Message.Visible := False;
+end;
+
+procedure TFrame_Recording2.Edit_AdresseExit(Sender: TObject);
+begin
+  if Edit_Adresse.Text <> '' then
+  begin
+    ImageAdresse.Picture := Form_Welcoming.ImageTrue.Picture;
+    ImageAdresse.Visible := True;
+  end
+  else ImageAdresse.Visible := False;
+
+end;
+
+procedure TFrame_Recording2.ComboBox_SexeExit(Sender: TObject);
+begin
+  if ComboBox_Sexe.Text <> '' then
+  begin
+    ImageSexe.Picture := Form_Welcoming.ImageTrue.Picture;
+    ImageSexe.Visible := True;
+  end
+  else ImageSexe.Visible := False;
+
+end;
+
+procedure TFrame_Recording2.ComboBox1Exit(Sender: TObject);
+begin
+  if ComboBox1.Text <> '' then
+  begin
+    Image8.Picture := Form_Welcoming.ImageTrue.Picture;
+    Image8.Visible := True;
+  end
+  else Image8.Visible := False;
+end;
+
+procedure TFrame_Recording2.ComboBox2Exit(Sender: TObject);
+begin
+  if ComboBox2.Text <> '' then
+  begin
+    Image7.Picture := Form_Welcoming.ImageTrue.Picture;
+    Image7.Visible := True;
+  end
+  else Image7.Visible := False;
+
+end;
+
+procedure TFrame_Recording2.DateTimePicker_Date_DateNescienceExit(
+  Sender: TObject);
+begin
+  ImageDate_DateNescience.Picture := Form_Welcoming.ImageTrue.Picture;
+  ImageDate_DateNescience.Visible := True;
+end;
+
+procedure TFrame_Recording2.Prior;
+begin
+  Form_Welcoming.Notebook1.ActivePage := 'Page_Recording1';
+end;
+
+end.
+

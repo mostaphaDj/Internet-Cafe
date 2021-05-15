@@ -1,0 +1,95 @@
+unit Post_Client_Concerted_U;
+
+interface
+
+uses Forms, Classes,
+  Type_U, Connexion_Concerted_U;
+
+type
+  TPost_Client_Concerted = class(TObject)
+  private
+    function GetRecordPost_Client: TRecordPost_Client;
+    procedure SetRecordPost_Client(const Value: TRecordPost_Client);
+
+  protected
+    FUnitObjets: TObject;
+    FHostName,FIPAddress: string;
+    FStateLock: TStateLock;
+    FConnexion: TConnexion_Concerted;
+    FRecordPost_Client: TRecordPost_Client;
+  public
+    constructor Create; virtual;
+    procedure UnLock; virtual;
+    procedure Lock; virtual;
+    procedure Change_Use(PCWay: TPost_Client_Concerted); virtual;
+    procedure ShutDown; virtual;
+    procedure Restart; virtual;
+    property HostName: string read FHostName write FHostName;
+    property IPAddress: string read FIPAddress write FIPAddress;
+    property StateLock: TStateLock read FStateLock write FStateLock;
+    property Connexion: TConnexion_Concerted read FConnexion write FConnexion;
+    property UnitObjets: TObject read FUnitObjets write FUnitObjets;
+    property RecordPost_Client: TRecordPost_Client read GetRecordPost_Client write SetRecordPost_Client; //
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses Classes_U, UnitObjets_Concerted_U;
+
+constructor TPost_Client_Concerted.Create;
+begin
+
+end;
+
+destructor TPost_Client_Concerted.Destroy;
+begin
+  TUnitObjets(FUnitObjets).Post_Client := nil;
+  inherited;
+end;
+
+procedure TPost_Client_Concerted.Lock;
+begin
+  FStateLock := slLock;
+end;
+
+procedure TPost_Client_Concerted.Restart;
+begin
+
+end;
+
+procedure TPost_Client_Concerted.ShutDown;
+begin
+
+end;
+
+procedure TPost_Client_Concerted.UnLock;
+begin
+  FStateLock := slUnLock;
+end;
+
+procedure TPost_Client_Concerted.Change_Use(PCWay: TPost_Client_Concerted);
+begin
+
+end;
+
+function TPost_Client_Concerted.GetRecordPost_Client: TRecordPost_Client;
+begin
+  with FRecordPost_Client do
+  begin
+    HostName:=FHostName;
+    IPAddress:= FHostName;
+    Password_UDP:=TUnitObjets(FUnitObjets).Connexion.Password_UDP;
+  end;
+  Result := FRecordPost_Client;
+end;
+
+procedure TPost_Client_Concerted.SetRecordPost_Client(
+  const Value: TRecordPost_Client);
+begin
+//  FHostName := Value.HostName;
+//  FHostName := Value.IPAddress ;
+//  TUnitObjets(FUnitObjets).Connexion.Password_UDP := Value.Password_UDP ;
+end;
+
+end.

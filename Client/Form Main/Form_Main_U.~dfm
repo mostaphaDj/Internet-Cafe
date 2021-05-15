@@ -1,0 +1,52 @@
+object Form_Main: TForm_Main
+  Left = 733
+  Top = 140
+  BorderStyle = bsSingle
+  Caption = 'Client Main Form'
+  ClientHeight = 551
+  ClientWidth = 272
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  FormStyle = fsStayOnTop
+  OldCreateOrder = False
+  Visible = True
+  PixelsPerInch = 96
+  TextHeight = 13
+  object ListBox1: TListBox
+    Left = 0
+    Top = 312
+    Width = 272
+    Height = 239
+    Align = alBottom
+    ItemHeight = 13
+    TabOrder = 0
+  end
+  object Button_Terminate: TButton
+    Left = 8
+    Top = 280
+    Width = 75
+    Height = 25
+    Caption = 'Terminate'
+    TabOrder = 1
+  end
+  object Button_Suspend: TButton
+    Left = 96
+    Top = 280
+    Width = 75
+    Height = 25
+    Caption = 'Suspend'
+    TabOrder = 2
+  end
+  object Button_Chonge_PC: TButton
+    Left = 184
+    Top = 280
+    Width = 75
+    Height = 25
+    Caption = 'Chonge_PC'
+    TabOrder = 3
+  end
+end

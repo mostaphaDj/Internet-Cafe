@@ -1,0 +1,159 @@
+unit Post_Client_Cli_U;
+
+interface
+
+uses Forms, IdTCPClient, Classes, SysUtils, IdTCPServer, Windows, Dialogs,
+  Post_Client_Concerted_U;
+
+
+type
+  TPost_Client_Cli = class(TPost_Client_Concerted)
+  private
+    { DÈclarations privÈes }
+  public
+    { DÈclarations publiques }
+    {Find}
+{MÈthod}
+    constructor Create; override;
+    procedure UnLock; override;
+    procedure Lock; override;
+//    procedure Change_Use_To;
+//    procedure Change_Use_For;
+    procedure ShutDown; override;
+    procedure Restart; override;
+    destructor Destroy; override;
+    {property}
+    {EvÈnements}
+  end;
+
+implementation
+
+uses Connexion_Module_U, Form_Main_U, Form_Lock_U,
+  IdTCPConnection, DateUtils, Miscellany_U, Frame_Cost_U, Data_Module_U,
+  Type_U;
+
+{ TPostClient }
+
+//*************** «·„‰«ÂÃ ******************
+
+procedure TPost_Client_Cli.Lock;
+begin
+  inherited;
+  FConnexion.AThread.Synchronize(Form_Lock.Lock_Windows);
+
+end;
+
+procedure TPost_Client_Cli.UnLock;
+begin
+  inherited;
+  FConnexion.AThread.Synchronize(Form_Lock.UnLock_Windows);
+end;
+
+procedure TPost_Client_Cli.Restart;
+resourcestring
+  MsgText = 'Œÿ√ ⁄‰œ „Õ«Ê·… ≈⁄«œ… «· ‘€Ì·';
+begin
+  if ExitWindows(EWX_REBOOT, 0) then
+  begin
+    with FConnexion.IdTCPClient do //    ·· ’ÕÌÌÕ ·«Õﬁ« («·«›÷· «” ⁄„«· UDP)
+    begin
+      try
+        Writeln('scReturn');
+      except
+        on E: Exception do
+        begin
+          MessageBox(Application.Handle, PChar(MsgText), PChar(MsgCaptionError + #13 +
+            E.Message), MB_OK + MsgType)
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TPost_Client_Cli.ShutDown;
+resourcestring
+  MsgText = 'Œÿ√ ⁄‰œ „Õ«Ê·… ≈ﬁ«› «· ‘€Ì·';
+begin
+  if _ExitWindows(EWX_POWEROFF or EWX_FORCE) then
+  begin
+    with FConnexion.idTCPClient do //    ·· ’ÕÌÌÕ ·«Õﬁ« («·«›÷· «” ⁄„«· UDP)
+    begin
+      try
+        Writeln('scShutDown');
+      except
+        on E: Exception do
+        begin
+          MessageBox(Application.Handle, PChar(MsgText), PChar(MsgCaptionError + #13 +
+            E.Message), MB_OK + MsgType)
+        end;
+      end;
+    end;
+  end;
+end;
+
+destructor TPost_Client_Cli.Destroy;
+begin
+  FConnexion.IdTCPClient.Free;
+  inherited;
+end;
+
+constructor TPost_Client_Cli.Create;
+begin
+  inherited;
+end;
+
+(*
+procedure TPost_Client_Cli.Change_Use_For; //  ÕÊÌ· „‰
+begin
+  try
+    if Form_Lock = nil then
+    begin
+      FConnexion.AThread.Synchronize(Form_Lock.Lock_Windows);
+//      FStateUse := suLock;
+      Use.Free;
+    end;
+  except
+    on E: Exception do
+    begin
+      FConnexion.AThread.Connection.WriteLn('·« Ì„ﬂ‰ «·≈ ’«·' +
+        E.Message);
+    end;
+  end;
+
+end;
+
+procedure TPost_Client_Cli.Change_Use_To; //  ÕÊÌ· ≈·Ï
+resourcestring
+  MsgText = 'ÕœÀ Œÿ√ ⁄‰œ «·«—”«· ··ﬂ„»ÌÊ — «·ÊÃÂ…';
+begin
+ (* try
+    if Form_Lock <> nil then
+    begin
+   //   Use := TUse.Create;
+      with Use do
+      begin
+        Post_Client := Self;
+        User := TUser.Create('undefined'); {«”„ «·„” Œœ„}
+        PriceHour := 50; {À„‰ «·”«⁄…} // ··≈ﬂ„«· ·«Õﬁ«
+      end;
+
+      with FUse do
+      begin
+        N_Use := AThread.Connection.ReadInteger;
+        PriceHour := AThread.Connection.ReadInteger;
+        TimeStart := StrToDateTime(AThread.Connection.ReadLn);
+        TimeUtilize := StrToDateTime(AThread.Connection.ReadLn);
+      end;
+      AThread.Synchronize(Form_Lock.UnLock_Windows);
+    end; //if Form_Lock <> nil then
+  except
+    on E: Exception do
+    begin
+    MessageBox(Application.Handle, PChar(MsgText+ #13 +
+        E.Message), PChar(MsgCaptionError), MB_OK+MsgType);
+    end;
+  end;
+
+end; *)
+
+end.

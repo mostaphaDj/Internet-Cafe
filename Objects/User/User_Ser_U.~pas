@@ -1,0 +1,222 @@
+unit User_Ser_U;
+
+interface
+
+uses Forms, windows, Controls,
+  User_Concerted_U, Type_U;
+
+type
+  TUser_Ser = class(TUser_Concerted)
+  private
+    procedure Setpseudonyme(const Value: ShortString); override;
+  protected
+
+  public
+    constructor Create(VUnitObjects: TObject; VPseudonyme: string); override;
+    class function Recording(VRUser: TRecordUser; VConnexion: TObject): Boolean; override; //     ”ÃÌ· (≈‰‘«¡ Õ”«» ÃœÌœ)
+    class function UsernameExists(VUsername: string; VConnexion: TObject): Boolean; override; // «· Õﬁﬁ „‰  Ê›— «”„ «·„” Œœ„
+    class function CheckPassword(VUsername: string; VPassword: string; VConnexion: TObject): Boolean; override; // «· Õﬁﬁ „‰ ’Õ… ﬂ·„… «·„—Ê—
+    procedure Demand_Use; override; // ÿ·»  «·≈ ’«·
+    class procedure Create_Use_User(VUnitObjects: TObject;VPseudonyme:String); override;
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses SysUtils,
+  Data_Module_U, Use_Ser_U, Form_Demand_Use_U, Classes_U,
+  UnitObjets_Concerted_U, Post_Client_Concerted_U;
+
+{ TUser_Ser }
+
+constructor TUser_Ser.Create(VUnitObjects: TObject; VPseudonyme: string);
+resourcestring
+  String_MessageUserCreate = ' ⁄–— «·≈ ’«· »«·„Œœ„';
+var
+  VRecordUser: TRecordUser;
+begin
+  inherited;
+  if VPseudonyme <> '' then
+  begin
+    with Data_Module do
+    begin
+      Table_User.Locate('pseudonyme', Fpseudonyme, []);
+      Fpseudonyme := Table_Userpseudonyme.Value; // ≈”„  «·œŒÊ·
+      FPrename := Table_UserPrenom.Value; // ≈”„ «·„” ⁄„·
+      FRate := Table_Userrate.Value; //     ’‰Ì› «·“»Ê‰
+      FName := Table_UserNom.Value; // ≈”„ «·⁄∆·…
+      FSexe := Table_UserSexe.Value; // «·Ã‰”
+      FPassword := Table_UserPassword.Value; // ﬂ·„… «·„—Ê—
+      FN_Carte := Table_UserN_Carte.Value; //   —ﬁ„ »ÿ«ﬁ… «· ⁄—Ì› «·Êÿ‰Ì
+      FEmail := Table_UserEmail.Value; //  «·»—Ìœ «·≈·ﬂ —Ê‰Ì
+      FAdresse := Table_UserAdresse.Value; //  «·⁄‰Ê«‰
+      FDateNescience := Table_UserDateNescience.Value; //   «—ÌŒ «·„Ì·«œ
+      FComputation := Table_UserComputation.Value; //  «·—’Ìœ √Ê «·œÌ‰
+      FDate_Register := Table_UserDate_Register.Value; //  «—ÌŒ «· ”ÃÌ·
+      FN_mobile := Table_UserN_mobile.Value; // «·Â« › «·ÃÊ«·
+      FNiveau_Informatique := Table_UserNiveau_Informatique.Value; //  «·Ê” ÊÏ ›Ì «·≈⁄·«„ «·¬·Ì
+      FVocation := Table_UserVocation.Value; // ; //   «·„Â‰…
+      FRemark := Table_UserRemark.Value; // „·«Õ÷… ⁄‰ «·“»Ê‰
+    end;
+//****************************************************************************
+    with FConnexion.IdTCPClient do
+    begin
+      try
+        Writeln('CreateUser');
+        VRecordUser := RecordUser;
+        WriteBuffer(VRecordUser, SizeOf(VRecordUser), True);
+        TUnitObjets(FUnitObjets).Change_ImageIndex;
+      except
+        on E: Exception do
+        begin
+          MessageBox(Application.Handle, PChar(String_MessageUserCreate + #13 + E.Message),
+            PChar(MsgCaptionError), $180000);
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TUser_Ser.Demand_Use;
+resourcestring
+  String_Message_Demand_Use_refusal = 'Œÿ√ ›Ì «·≈ ’«· ·«Ì„ﬂ‰ ≈ﬂ„«· «·⁄„·Ì…';
+var
+  VPseudonyme: string;
+begin
+  inherited;
+  VPseudonyme := FConnexion.AThread.Connection.ReadLn;
+  TUnitObjets(FUnitObjets).Use.TimeDesired := StrToDateTime(FConnexion.AThread.Connection.ReadLn);
+  Form_Demand_Use := TForm_Demand_Use.Create(Application);
+  with Form_Demand_Use.ValueListEditor1 do
+  begin
+    Values['Poste'] := TUnitObjets(UnitObjets).Post_Client.HostName;
+    Values['User'] := TUnitObjets(UnitObjets).User.Pseudonyme + ' | ' + UnitObjets_Active.User.Prename + ' ' + UnitObjets_Active.User.Name;
+    Values['TimeDesired'] := TimeToStr(TUnitObjets(UnitObjets).Use.TimeDesired);
+  end;
+  if Form_Demand_Use.ShowModal = mrok then
+  begin
+    TUnitObjets(FUnitObjets).Use.Start;
+  end
+  else
+  begin
+    TUnitObjets(FUnitObjets).Use.Free;
+    TUnitObjets(FUnitObjets).Use := nil;
+    TUnitObjets(FUnitObjets).User.Free;
+    TUnitObjets(FUnitObjets).User := nil;
+    try
+      TUnitObjets(FUnitObjets).Connexion.IdTCPClient.WriteLn('Demand_Use_refusal'); //  ·›÷ ÿ·» «·Ã·”…
+    except
+      on E: Exception do
+      begin
+        MessageBox(Application.Handle, PChar(String_Message_Demand_Use_refusal + #13 + E.Message),
+          PChar(MsgCaptionError), $180000);
+      end;
+    end;
+  end;
+  FreeAndNil(Form_Demand_Use);
+end;
+
+destructor TUser_Ser.Destroy;
+begin
+
+  inherited;
+end;
+
+class function TUser_Ser.Recording(VRUser: TRecordUser; VConnexion: TObject): Boolean;
+var
+  VRecordUser: TRecordUser;
+begin
+  inherited Recording(VRUser, VConnexion); ;
+
+  try
+    with TConnexion(VConnexion).AThread.Connection do
+    begin
+      ReadBuffer(VRecordUser, SizeOf(VRecordUser));
+      VRUser := VRecordUser;
+    end;
+    with Data_Module do
+    begin
+      Table_User.Insert;
+      Table_Userpseudonyme.Value := VRUser.pseudonyme; // ≈”„  «·œŒÊ·
+      Table_UserPrenom.Value := VRUser.Prename; // ≈”„ «·„” ⁄„·
+      Table_Userrate.Value := VRUser.Rate; //     ’‰Ì› «·“»Ê‰
+      Table_UserNom.Value := VRUser.Name; // ≈”„ «·⁄∆·…
+      Table_UserSexe.Value := VRUser.Sexe; // «·Ã‰”
+      Table_UserPassword.Value := VRUser.Password; // ﬂ·„… «·„—Ê—
+      Table_UserN_Carte.Value := VRUser.N_Carte; //   —ﬁ„ »ÿ«ﬁ… «· ⁄—Ì› «·Êÿ‰Ì
+      Table_UserEmail.Value := VRUser.Email; //  «·»—Ìœ «·≈·ﬂ —Ê‰Ì
+      Table_UserAdresse.Value := VRUser.Adresse; //  «·⁄‰Ê«‰
+      Table_UserDateNescience.Value := VRUser.DateNescience; //   «—ÌŒ «·„Ì·«œ
+      Table_UserComputation.Value := VRUser.Computation; //  «·—’Ìœ √Ê «·œÌ‰
+      Table_UserDate_Register.Value := VRUser.Date_Register; //  «—ÌŒ «· ”ÃÌ·
+      Table_UserN_mobile.Value := VRUser.N_mobile; // «·Â« › «·ÃÊ«·
+      Table_UserNiveau_Informatique.Value := VRUser.Niveau_Informatique; //  «·Ê” ÊÏ ›Ì «·≈⁄·«„ «·¬·Ì
+      Table_UserVocation.Value := VRUser.Vocation; // ; //   «·„Â‰…
+      Table_UserRemark.Value := VRUser.Remark; // „·«Õ÷… ⁄‰ «·“»Ê‰
+      Table_User.Post;
+    end;
+    Result := True;
+  except
+    Result := False;
+  end;
+end;
+
+procedure TUser_Ser.Setpseudonyme(const Value: ShortString);
+begin
+  inherited;
+  if pseudonyme <> '' then
+  begin
+    with Data_Module do
+    begin
+      Table_User.Locate('pseudonyme', Fpseudonyme, []);
+      Fpseudonyme := Table_Userpseudonyme.Value; // ≈”„  «·œŒÊ·
+      FPrename := Table_UserPrenom.Value; // ≈”„ «·„” ⁄„·
+      FRate := Table_Userrate.Value; //     ’‰Ì› «·“»Ê‰
+      FName := Table_UserNom.Value; // ≈”„ «·⁄∆·…
+      FSexe := Table_UserSexe.Value; // «·Ã‰”
+      FPassword := Table_UserPassword.Value; // ﬂ·„… «·„—Ê—
+      FN_Carte := Table_UserN_Carte.Value; //   —ﬁ„ »ÿ«ﬁ… «· ⁄—Ì› «·Êÿ‰Ì
+      FEmail := Table_UserEmail.Value; //  «·»—Ìœ «·≈·ﬂ —Ê‰Ì
+      FAdresse := Table_UserAdresse.Value; //  «·⁄‰Ê«‰
+      FDateNescience := Table_UserDateNescience.Value; //   «—ÌŒ «·„Ì·«œ
+      FComputation := Table_UserComputation.Value; //  «·—’Ìœ √Ê «·œÌ‰
+      FDate_Register := Table_UserDate_Register.Value; //  «—ÌŒ «· ”ÃÌ·
+      FN_mobile := Table_UserN_mobile.Value; // «·Â« › «·ÃÊ«·
+      FNiveau_Informatique := Table_UserNiveau_Informatique.Value; //  «·Ê” ÊÏ ›Ì «·≈⁄·«„ «·¬·Ì
+      FVocation := Table_UserVocation.Value; // ; //   «·„Â‰…
+      FRemark := Table_UserRemark.Value; // „·«Õ÷… ⁄‰ «·“»Ê‰
+    end;
+  end;
+end;
+
+class function TUser_Ser.UsernameExists(VUsername: string; VConnexion: TObject): Boolean; // «· Õﬁﬁ „‰  Ê›— «”„ «·„” Œœ„
+begin
+  inherited UsernameExists(VUsername, VConnexion);
+  if Data_Module.Table_User.Locate('pseudonyme', VUsername, []) then //«· Õﬁﬁ „‰ ≈”„ «·„” ⁄„·
+    Result := True
+  else Result := False;
+end;
+
+class function TUser_Ser.CheckPassword(VUsername: string; VPassword: string; VConnexion: TObject): Boolean; // «· Õﬁﬁ „‰ ’Õ… ﬂ·„… «·„—Ê—
+begin
+  inherited CheckPassword(VUsername, VPassword, VConnexion);
+  if Data_Module.Table_User.Locate('pseudonyme', VUsername, []) then //«· Õﬁﬁ „‰ ≈”„ «·„” ⁄„·
+  begin
+    if Data_Module.Table_User.FieldByName('Password').AsString = VPassword then //«· Õﬁﬁ „‰ ﬂ·„… «·„—Ê—
+      Result := True
+    else Result := False;
+  end else Result := False;
+end;
+
+class procedure TUser_Ser.Create_Use_User(VUnitObjects: TObject;VPseudonyme:String);
+resourcestring
+  String_Message_Demand_Use_refusal = 'Œÿ√ ›Ì «·≈ ’«· ·«Ì„ﬂ‰ ≈ﬂ„«· «·⁄„·Ì…';
+begin
+  inherited;
+  VPseudonyme := TUnitObjets(VUnitObjects).Connexion.AThread.Connection.ReadLn;
+  TUnitObjets(VUnitObjects).User := TUser_Ser.Create(TUnitObjets(VUnitObjects), VPseudonyme);
+  TUnitObjets(VUnitObjects).Use := TUse_Ser.Create(TUnitObjets(VUnitObjects).Post_Client, TUnitObjets(VUnitObjects).User, TUnitObjets(VUnitObjects));
+end;
+
+end.
+

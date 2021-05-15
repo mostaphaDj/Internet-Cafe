@@ -1,0 +1,151 @@
+unit Connexion_Module_U;
+
+interface
+
+uses
+  SysUtils, Classes, IdBaseComponent, IdComponent, IdTCPServer,
+  IdAntiFreezeBase, IdAntiFreeze, ComCtrls
+  , IdThreadMgr, IdThreadMgrDefault, IdUDPBase, IdUDPServer, IdSocketHandle,
+  IdUDPClient;
+
+type
+  TConnexion_Module = class(TDataModule)
+    IdTCPServer: TIdTCPServer;
+    IdAntiFreeze: TIdAntiFreeze;
+    IdThreadMgrDefault: TIdThreadMgrDefault;
+    IdUDPServer: TIdUDPServer;
+    IdUDPClient: TIdUDPClient;
+    procedure IdTCPServerConnect(AThread: TIdPeerThread);
+    procedure IdTCPServerDisconnect(AThread: TIdPeerThread);
+    procedure IdTCPServerExecute(AThread: TIdPeerThread);
+    procedure DataModuleCreate(Sender: TObject);
+    procedure IdUDPServerUDPRead(Sender: TObject; AData: TStream;
+      ABinding: TIdSocketHandle);
+  private
+    { DÈclarations privÈes }
+  public
+    { DÈclarations publiques }
+  end;
+
+var
+  Connexion_Module: TConnexion_Module;
+
+implementation
+
+uses Form_ListView_Post_Client_U, Action_Module_U, Data_Module_U, Type_U,
+  IdTCPConnection, User_Concerted_U, Use_Ser_U, UnitObjets_Ser_U,
+  Classes_U;
+
+{$R *.dfm}
+
+procedure TConnexion_Module.IdTCPServerConnect(AThread: TIdPeerThread);
+var
+  PostIndex: Integer;
+begin
+  PostIndex := ListUnitObjets.ChercherPostName(AThread.Connection.Socket.LocalName);
+  if PostIndex = -1 then
+  begin
+    //PostIndex := ListUnitObjets.Add(TUnitObjets.Create(AThread))
+  end
+  else
+  begin
+    TUnitObjets(ListUnitObjets.Items[PostIndex]).Connexion.AThread := AThread;
+  end;
+  AThread.Data := TObject(ListUnitObjets.Items[PostIndex]);
+  TUnitObjets(ListUnitObjets.Items[PostIndex]).Connexion.StateConnect := scConnected; //  ·· ’ÕÌÕ ·«Õﬁ«
+  TUnitObjets(ListUnitObjets.Items[PostIndex]).Post_Client.StateLock := slUnLock; //  ·· ’ÕÌÕ ·«Õﬁ«
+end;
+
+procedure TConnexion_Module.IdTCPServerDisconnect(AThread: TIdPeerThread);
+begin
+  TUnitObjets(AThread.Data).Connexion.StateConnect := scDisconnect;
+  TUnitObjets(AThread.Data).Connexion.IdTCPClient.Disconnect;
+  AThread.Data := nil; //Post_Client ·ﬂÌ ·« Ì „  Õ—Ì—
+end;
+
+procedure TConnexion_Module.IdTCPServerExecute(AThread: TIdPeerThread);
+var
+  Command: string;
+  PostIndex: Integer;
+  RecordUser: TRecordUser;
+begin
+  if not AThread.Terminated and AThread.Connection.Connected then
+  begin
+    with AThread.Connection do
+    begin
+      Command := ReadLn;
+      if Command = 'Create_Use_User' then
+      begin
+        TUser.Create_Use_User(AThread.Data, '');
+      end
+      else
+        if Command = 'Demand_Use' then
+        begin
+          AThread.Synchronize(TUnitObjets(AThread.Data).User.Demand_Use);
+        end
+        else
+          if Command = 'UsernameExists' then
+            if TUser.UsernameExists(Readln, TUnitObjets(AThread.Data).Connexion) then WriteLn('True') else WriteLn('False')
+          else // Command = 'checkUsername'
+            if Command = 'checkPassword' then if TUser.CheckPassword(Readln, ReadLn, TUnitObjets(AThread.Data).Connexion) then WriteLn('True') else WriteLn('False')
+            else
+              if Command = 'RecordingUser' then
+              begin
+                if TUser.Recording(RecordUser, TUnitObjets(AThread.Data).Connexion) then WriteLn('True') else WriteLn('False');
+              end
+              else
+                if Command = 'scReturn' then
+                begin
+                  TUnitObjets(AThread.Data).Connexion.StateConnect := scReturn; TUnitObjets(AThread.Data).Change_ImageIndex;
+                end
+                else
+                  if Command = 'scShutDown' then
+                  begin
+                    TUnitObjets(AThread.Data).Connexion.StateConnect := scShutDown; TUnitObjets(AThread.Data).Change_ImageIndex;
+                  end;
+    end;
+  end;
+end;
+
+procedure TConnexion_Module.DataModuleCreate(Sender: TObject);
+begin
+  ListUnitObjets := TListUnitObjets.Create;
+  Action_Module := TAction_Module.Create(Self);
+end;
+
+procedure TConnexion_Module.IdUDPServerUDPRead(Sender: TObject;
+  AData: TStream; ABinding: TIdSocketHandle);
+var
+  Password_UDP, VString: string;
+  VRecordPost_Client: TRecordPost_Client;
+  PostIndex: Integer;
+begin
+  Password_UDP := 'Password_UDP';
+  VString := 'Password_UDP_Valid';
+  try
+    AData.ReadBuffer(VRecordPost_Client, sizeof(VRecordPost_Client));
+    UnitObjets_Active.Post_Client.RecordPost_Client := VRecordPost_Client;
+    if UnitObjets_Active.Post_Client.RecordPost_Client.Password_UDP = Password_UDP then
+    begin
+      VString := IdUDPServer.LocalName;
+      ABinding.SendTo(ABinding.PeerIP, ABinding.PeerPort, VString[1], Length(IdUDPServer.LocalName));
+      PostIndex := ListUnitObjets.ChercherPostName(UnitObjets_Active.Post_Client.RecordPost_Client.HostName);
+      if PostIndex = -1 then
+      begin
+        PostIndex := ListUnitObjets.Add(TUnitObjets.Create(nil));
+      end;
+      TUnitObjets(ListUnitObjets.Items[PostIndex]).Connexion.Connect(UnitObjets_Active.Post_Client.RecordPost_Client.HostName);
+
+    end
+    else
+    begin
+      VString := IdUDPServer.LocalName;
+      ABinding.SendTo(ABinding.PeerIP, ABinding.PeerPort, VString[1], Length(VString));
+    end;
+  finally
+    DataStringStream.Free;
+  end;
+end;
+
+end.
+

@@ -1,0 +1,14 @@
+object Frame_Demand_Use: TFrame_Demand_Use
+  Left = 0
+  Top = 0
+  Width = 330
+  Height = 250
+  TabOrder = 0
+  object Label2: TLabel
+    Left = 128
+    Top = 120
+    Width = 83
+    Height = 13
+    Caption = #1580#1575#1585#1610' '#1591#1604#1576' '#1575#1604#1575#1578#1589#1575#1604
+  end
+end

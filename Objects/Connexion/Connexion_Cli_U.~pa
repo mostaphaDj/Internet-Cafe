@@ -1,0 +1,36 @@
+unit Connexion_Cli_U;
+
+interface
+
+uses Connexion_Concerted_U, IdTCPServer;
+
+type
+  TConnexion_Cli = class(TConnexion_Concerted)
+  private
+  protected
+
+  public
+    constructor Create(VAThread: TIdPeerThread); override;
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses Type_U, Conect_Thead_U;
+
+{ TConnexion_Cli }
+
+constructor TConnexion_Cli.Create(VAThread: TIdPeerThread);
+begin
+  inherited;
+  IdTCPClient.Port := 6000;
+  TConectThead.Create(False, IdTCPClient);
+end;
+
+destructor TConnexion_Cli.Destroy;
+begin
+
+  inherited;
+end;
+
+end.

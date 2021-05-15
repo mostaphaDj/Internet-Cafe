@@ -1,0 +1,57 @@
+unit UnitObjets_Cli_U;
+
+interface
+
+uses Windows, Forms, Classes, SysUtils, ComCtrls, IdTCPServer,
+  Post_Client_Cli_U, User_Cli_U, Use_Cli_U, Connexion_Cli_U, UnitObjets_Concerted_U
+  , Post_Client_Concerted_U, Use_Concerted_U, User_Concerted_U;
+
+type
+  TUnitObjets_Cli = class(TUnitObjets_Concerted)
+  private
+    procedure SetPost_Client(const Value: TPost_Client_Concerted); override;
+    procedure SetUse(const Value: TUse_Concerted); override;
+    procedure SetUser(const Value: TUser_Concerted); override;
+  protected
+  public
+    constructor Create(VAThread: TIdPeerThread;VHostName:String); override;
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses Type_U, Char_U;
+
+{ TUnitObjets }
+
+constructor TUnitObjets_Cli.Create(VAThread: TIdPeerThread;VHostName:String);
+begin
+  inherited ;
+  Post_Client := TPost_Client_Cli.Create;
+end;
+
+destructor TUnitObjets_Cli.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TUnitObjets_Cli.SetPost_Client(const Value: TPost_Client_Concerted);
+begin
+  inherited;
+
+end;
+
+procedure TUnitObjets_Cli.SetUse(const Value: TUse_Concerted);
+begin
+  inherited;
+
+end;
+
+procedure TUnitObjets_Cli.SetUser(const Value: TUser_Concerted);
+begin
+  inherited;
+
+end;
+
+end.

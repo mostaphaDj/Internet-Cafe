@@ -1,0 +1,263 @@
+unit Use_Concerted_U;
+
+interface
+
+uses
+  User_Concerted_U, Round_U, Post_Client_Concerted_U,
+  Type_U, Connexion_Concerted_U;
+
+type
+  TUse_Concerted = class(TObject)
+  protected
+    FN_Use: Integer;
+    FTimeStart: TDateTime;
+    FRound: TRound;
+    FState: TStateUse;
+    FPost_Client: TPost_Client_Concerted;
+    FRecordUse: TRecordUse;
+    FPriceHour: Currency;
+    FConnexion: TConnexion_Concerted;
+    FPayment: Integer;
+    FUser: TUser_Concerted;
+    FUnitObjets: TObject;
+  private
+    FCost: Currency;
+    FTimeUtilize: TDateTime;
+    FTimeDesired: TDateTime; //   «·Êﬁ  «·„ÿ·Ê»
+    FTimeFin: TDateTime;
+    FTimeFinVirtual: TDateTime;
+    FCostVirtual: Currency;
+
+    procedure SetCostHour(const Value: Currency);
+    procedure SetTimeFin(const Value: TDateTime);
+    function AccountTimeUtilizeWhomCost: TDateTime; //  Õ”«» „œ… «·Ã·”… „‰ «·„»·€
+    function AccountTimeUtilizeWhomTimeFin(TimeFin: TDateTime): TDateTime; //  Õ”«» „œ… «·Ã·”… „‰ Êﬁ  ≈‰ Â«¡ «·Ã·”…
+    function AccountTimeFin: TDateTime; // Õ”«» Êﬁ  ≈‰ Â«¡ «·Ã·”…
+    function AccountCost(TimeUtilize: TDateTime): Currency; // Õ”«» «·„»·€
+
+    procedure SetTimeFinVirtual(const Value: TDateTime);
+    procedure SetTimeDesired(const Value: TDateTime);
+    procedure SetState(const Value: TStateUse);
+    function GetCost: Currency;
+    procedure SetCostVirtual(const Value: Currency);
+    function GetTimeUtilize: TDateTime;
+    function GetRecordUse: TRecordUse;
+    procedure SetRecordUse(const Value: TRecordUse);
+
+  public
+    constructor Create(VPost_Client: TPost_Client_Concerted; VUser: TUser_Concerted; VUnitObjects: TObject); virtual; //CreateUnLock
+
+    procedure Start; virtual; //  «‰ÿ·«ﬁ
+    procedure Suspend; virtual; //  ÌÊﬁ› „ƒﬁ «
+    procedure Resume; virtual; //  Ì” √‰›
+    procedure StopAndCancel; virtual; // ≈·€«¡ «·Ã·”…
+    procedure Terminate; virtual; //  Ì‰ÂÏ
+//    procedure Change_Post(PCCourse {«·ÊÃÂ…}: TPost_Client_Concerted); virtual; //   €ÌÌ— «·Õ«”Ê»
+    property N_Use: Integer read FN_Use write FN_Use; {—ﬁ„ «·Ã·”…}
+    property Post_Client: TPost_Client_Concerted read FPost_Client write FPost_Client;
+    property User: TUser_Concerted read FUser write FUser; {«”„ «·„” Œœ„}
+    property TimeStart: TDateTime read FTimeStart write FTimeStart; //default Now;{Êﬁ  »œ¡ «·Ã·”…}
+    property TimeFin: TDateTime read FTimeFin write SetTimeFin; // Êﬁ  ≈‰Â«¡ «·Ã·”…
+    property TimeFinVirtual: TDateTime read FTimeFinVirtual write SetTimeFinVirtual; // Êﬁ  «·«‰ Â«¡ «·„› —÷
+    property TimeUtilize: TDateTime read GetTimeUtilize write FTimeUtilize; //      {«·Êﬁ  «·„” Œœ„}
+    property TimeDesired: TDateTime read FTimeDesired write SetTimeDesired; //   «·Êﬁ  «·„ÿ·Ê»
+    property PriceHour: Currency read FPriceHour write SetCostHour; {À„‰ «·”«⁄…}
+    property CostVirtual: Currency read FCostVirtual write SetCostVirtual; {«·„»·€ «·„› —÷}
+    property Cost: Currency read GetCost write FCost; {„»·€ Â–Â «·Ã·”… ›ﬁÿ »œÊ‰ «·œÌ‰}
+    property Payment: Integer read FPayment write FPayment default 0; {«·œ›⁄}
+    property State: TStateUse read FState write SetState; {«·Ê÷⁄Ì…}
+    property RecordUse: TRecordUse read GetRecordUse write SetRecordUse;
+    property Connexion: TConnexion_Concerted read FConnexion write FConnexion;
+    property UnitObjets: TObject read FUnitObjets write FUnitObjets;
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses DateUtils, SysUtils, Classes_U;
+
+{ TAccountTimeAndCost }
+
+function TUse_Concerted.AccountCost(TimeUtilize: TDateTime): Currency; // Õ”«» «·„»·€
+begin
+  Result := FRound.Round((FPriceHour * MinuteOfTheDay(TimeUtilize)) / 60);
+end;
+
+function TUse_Concerted.AccountTimeFin: TDateTime; // Õ”«» Êﬁ  ≈‰ Â«¡ «·Ã·”…
+begin
+  Result := Now + FTimeDesired;
+end;
+
+function TUse_Concerted.AccountTimeUtilizeWhomCost: TDateTime; //  Õ”«» „œ… «·Ã·”… „‰ «·„»·€
+var
+  Hour: Integer;
+  TimeUtilizeOfMinute: Integer;
+begin
+  if FPriceHour <> 0 then
+  begin
+    TimeUtilizeOfMinute := System.Round((60 * FCostVirtual) / FPriceHour);
+    Hour := TimeUtilizeOfMinute div 60;
+    if Hour <> 0 then
+    begin
+      Result := StrToDateTime(IntToStr(Hour) + ':' + IntToStr(TimeUtilizeOfMinute - (Hour * 60)) + ':' + '00');
+    end
+    else
+    begin
+      Result := StrToDateTime('00' + ':' + IntToStr(TimeUtilizeOfMinute) + ':' + '00');
+    end;
+  end
+  else
+  begin
+    Result := StrToDateTime('00' + ':' + '00' + ':' + '00');
+  end;
+
+end;
+
+function TUse_Concerted.AccountTimeUtilizeWhomTimeFin(TimeFin: TDateTime): TDateTime; //  Õ”«» „œ… «·Ã·”… „‰ Êﬁ  ≈‰ Â«¡ «·Ã·”…
+begin
+  Result := TimeFin - FTimeStart; //+ StrToTime('00:01:00');
+end;
+
+procedure TUse_Concerted.SetCostHour(const Value: Currency);
+begin
+  if FPriceHour = Value then Exit;
+  FPriceHour := Value;
+end;
+
+procedure TUse_Concerted.SetTimeFin(const Value: TDateTime);
+begin
+  if FTimeFin = Value then Exit;
+  FTimeFin := Value;
+end;
+
+constructor TUse_Concerted.Create(VPost_Client: TPost_Client_Concerted; VUser: TUser_Concerted; VUnitObjects: TObject);
+begin
+  FRound := TRound.Create;
+  FUnitObjets := VUnitObjects;
+  TUnitObjets(FUnitObjets).Use := self;
+  FPost_Client := VPost_Client;
+  FUser := VUser;
+end;
+
+destructor TUse_Concerted.Destroy;
+begin
+  FreeAndNil(FRound);
+  TUnitObjets(FUnitObjets).Use := nil;
+  inherited;
+end;
+
+
+procedure TUse_Concerted.SetTimeFinVirtual(const Value: TDateTime);
+begin
+  if FTimeFinVirtual = Value then Exit;
+  FTimeFinVirtual := Value;
+  FTimeDesired := AccountTimeUtilizeWhomTimeFin(FTimeFinVirtual);
+  if CostVirtual = 0 then FState := suUsageTimeUnlimited
+  else FState := suUsageTimelimited;
+  FCostVirtual := AccountCost(FTimeDesired);
+end;
+
+procedure TUse_Concerted.SetTimeDesired(const Value: TDateTime);
+begin
+  if FTimeDesired = Value then Exit;
+  FTimeDesired := Value;
+  if CostVirtual = 0 then FState := suUsageTimeUnlimited
+  else FState := suUsageTimelimited;
+  FCostVirtual := AccountCost(FTimeDesired);
+  FTimeFinVirtual := AccountTimeFin;
+end;
+
+procedure TUse_Concerted.Start; //  «‰ÿ·«ﬁ
+begin
+
+end;
+
+procedure TUse_Concerted.Resume; //  Ì” √‰›
+begin
+
+end;
+
+procedure TUse_Concerted.StopAndCancel; // ≈·€«¡ «·Ã·”…
+begin
+
+end;
+
+procedure TUse_Concerted.Suspend; //  ÌÊﬁ› „ƒﬁ «
+begin
+
+end;
+
+procedure TUse_Concerted.Terminate; //  Ì‰ÂÏ
+begin
+
+end;
+
+(*
+procedure TUse_Concerted.Change_Post(PCCourse {«·ÊÃÂ…}: TPost_Client_Concerted); //   €ÌÌ— «·Õ«”Ê»
+begin
+
+end; *)
+
+procedure TUse_Concerted.SetState(const Value: TStateUse);
+begin
+  if FState = Value then Exit;
+  FState := Value;
+end;
+
+function TUse_Concerted.GetCost: Currency;
+begin
+  Result := AccountCost(TimeUtilize);
+end;
+
+procedure TUse_Concerted.SetCostVirtual(const Value: Currency);
+begin
+  if FCostVirtual = Value then Exit;
+  FCostVirtual := Value;
+  if Value = 0 then FState := suUsageTimeUnlimited
+  else FState := suUsageTimelimited;
+  FTimeDesired := AccountTimeUtilizeWhomCost;
+  FTimeFinVirtual := AccountTimeFin;
+end;
+
+function TUse_Concerted.GetTimeUtilize: TDateTime;
+begin
+  Result := AccountTimeUtilizeWhomTimeFin(Now);
+end;
+
+function TUse_Concerted.GetRecordUse: TRecordUse;
+begin
+  with FRecordUse do
+  begin
+    N_Use := FN_Use; {—ﬁ„ «·Ã·”…}
+//    Post_Client:= TObject;    ··‰÷— ·«Õﬁ«
+//    User:= TUser;        ;  {«”„ «·„” Œœ„}
+    CostHour := FPriceHour; {À„‰ «·”«⁄…}
+    TimeStart := FTimeStart; //default Now;{Êﬁ  »œ¡ «·Ã·”…}
+    TimeFin := FTimeFin; // Êﬁ  ≈‰Â«¡ «·Ã·”…
+    TimeFinVirtual := FTimeFinVirtual; // Êﬁ  ≈‰Â«¡ «·Ã·”…
+    TimeUtilize := FTimeUtilize; //      {«·Êﬁ  «·„” Œœ„}
+    TimeDesired := FTimeDesired; //   «·Êﬁ  «·„ÿ·Ê»
+    CostVirtual := FCostVirtual; {«·„»·€ «·„› —÷}
+    Cost := FCost; {«·„»·€}
+    State := FState; {«·Ê÷⁄Ì…}
+  end;
+  Result := FRecordUse;
+end;
+
+procedure TUse_Concerted.SetRecordUse(const Value: TRecordUse);
+begin
+  N_Use := Value.N_Use; {—ﬁ„ «·Ã·”…}
+//    FRecordUse.Post_Client:= TObject;    ··‰÷— ·«Õﬁ«
+//    FRecordUse.User:= TUser;           {«”„ «·„” Œœ„}
+  FPriceHour := Value.CostHour; {À„‰ «·”«⁄…}
+  FTimeStart := Value.TimeStart; //default Now;{Êﬁ  »œ¡ «·Ã·”…}
+  FTimeFin := Value.TimeFin; // Êﬁ  ≈‰Â«¡ «·Ã·”…
+  FTimeFinVirtual := Value.TimeFinVirtual; // Êﬁ  ≈‰Â«¡ «·Ã·”…
+  FTimeUtilize := Value.TimeUtilize; //      {«·Êﬁ  «·„” Œœ„}
+  FTimeDesired := Value.TimeDesired; //   «·Êﬁ  «·„ÿ·Ê»
+  FCostVirtual := Value.CostVirtual; {«·„»·€ «·„› —÷}
+  FCost := Value.Cost; {«·„»·€}
+  FState := Value.State; {«·Ê÷⁄Ì…}
+end;
+
+end.

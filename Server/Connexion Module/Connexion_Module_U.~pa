@@ -1,0 +1,83 @@
+unit Connexion_Module_U;
+
+interface
+
+uses
+  SysUtils, Classes, IdBaseComponent, IdComponent, IdTCPServer,
+  IdAntiFreezeBase, IdAntiFreeze, ComCtrls;
+
+type
+  TConnexion_Module = class(TDataModule)
+    IdTCPServer1: TIdTCPServer;
+    IdAntiFreeze1: TIdAntiFreeze;
+    procedure IdTCPServer1Connect(AThread: TIdPeerThread);
+    procedure IdTCPServer1Disconnect(AThread: TIdPeerThread);
+    procedure IdTCPServer1Execute(AThread: TIdPeerThread);
+    procedure DataModuleCreate(Sender: TObject);
+  private
+    { DÈclarations privÈes }
+  public
+    { DÈclarations publiques }
+  end;
+
+var
+  Connexion_Module: TConnexion_Module;
+
+implementation
+
+uses Post_Client_Ser_U, Form_ListView_Post_Client_U, Action_Module_U;
+
+{$R *.dfm}
+
+procedure TConnexion_Module.IdTCPServer1Connect(AThread: TIdPeerThread);
+var
+  PostIndex: Integer;
+begin
+  PostIndex := Form_ListView_Post_Client.ChercherPostName(AThread.Connection.Socket.LocalName);
+  if PostIndex = -1 then
+  begin
+    TPost_Client_Ser.Create(AThread);
+  end
+  else
+  begin
+    TPost_Client_Ser(Form_ListView_Post_Client.ListView1.Items.Item[PostIndex].Data).AThread := AThread;
+    TPost_Client_Ser(Form_ListView_Post_Client.ListView1.Items.Item[PostIndex].Data).StateConnect := scConnected;
+    AThread.Data := TObject(Form_ListView_Post_Client.ListView1.Items.Item[PostIndex].data);
+  end;
+end;
+
+procedure TConnexion_Module.IdTCPServer1Disconnect(AThread: TIdPeerThread);
+begin
+  TPost_Client_Ser(AThread.Data).StateConnect := scUnbeknownDisconnect;
+  TPost_Client_Ser(AThread.Data).idTCPClient.Disconnect;
+  AThread.Data := nil; //Post_Client ·ﬂÌ ·« Ì „  Õ—Ì—
+end;
+
+procedure TConnexion_Module.IdTCPServer1Execute(AThread: TIdPeerThread);
+var
+  Command: string;
+  PostIndex: Integer;
+  Post_Client: TPost_Client_Ser;
+
+begin
+  with AThread.Connection do
+  begin
+    Command := ReadLn;
+//    Form_ListView_Post_Client.Edit1.Text := Command;
+    PostIndex := Form_ListView_Post_Client.ChercherPostName(AThread.Connection.Socket.LocalName);
+    Post_Client := TPost_Client_Ser(Form_ListView_Post_Client.ListView1.Items.Item[PostIndex].Data);
+    if PostIndex <> -1 then
+    begin
+      if Command = 'scReturn' then begin Post_Client.StateConnect := scReturn; Post_Client.Change_ImageIndex; end else
+        if Command = 'scShutDown' then begin Post_Client.StateConnect := scShutDown; Post_Client.Change_ImageIndex; end;
+    end;
+  end;
+end;
+
+
+procedure TConnexion_Module.DataModuleCreate(Sender: TObject);
+begin
+  Action_Module := TAction_Module.Create(Self);
+end;
+
+end.

@@ -1,0 +1,183 @@
+unit Action_Module_U;
+
+interface
+
+uses
+  SysUtils, Classes, ActnList, XPStyleActnCtrls, ActnMan, Controls, StdActns,
+  ImgList, Forms, ExtCtrls;
+
+type
+  TAction_Module = class(TDataModule)
+    ActionManager: TActionManager;
+    UnLock: TAction;
+    UnLockPartTime: TAction;
+    LockCancel: TAction;
+    Change_Use: TAction;
+    Restart: TAction;
+    ShutDown: TAction;
+    LockPayment: TAction;
+    ImageList1: TImageList;
+    ImageList2: TImageList;
+    Timer1: TTimer;
+    Suspend: TAction;
+    procedure UnLockExecute(Sender: TObject);
+    procedure UnLockPartTimeExecute(Sender: TObject);
+    procedure LockCancelExecute(Sender: TObject);
+    procedure ShutDownExecute(Sender: TObject);
+    procedure RestartExecute(Sender: TObject);
+    procedure LockPaymentExecute(Sender: TObject);
+    procedure Change_UseExecute(Sender: TObject);
+  private
+    { DÈclarations privÈes }
+  public
+    { DÈclarations publiques }
+  end;
+
+procedure ActionEnabledUnlimited;
+procedure ActionEnabledTimelimited;
+procedure ActionEnabledSuspend;
+procedure ActionEnabledLock;
+
+procedure ActionDisabled;
+
+var
+  Action_Module: TAction_Module;
+
+implementation
+
+uses Form_ListView_Post_Client_U, Form_Payment_U,
+  Form_Change_Use_U, ComCtrls,
+  Frame_Limitation_Time_U, Form_Limitation_Time_U, Type_U,
+  Post_Client_Ser_U, Classes_U;
+
+{$R *.dfm}
+
+procedure TAction_Module.UnLockExecute(Sender: TObject);
+begin
+  Form_ListView_Post_Client.ListView1.Cursor := crHourGlass;
+  UnitObjets_Active.User := TUser.Create(UnitObjets_Active, 'undefined');
+  UnitObjets_Active.Use := TUse.Create(UnitObjets_Active.Post_Client, UnitObjets_Active.User, UnitObjets_Active);
+  UnitObjets_Active.Use.Start;
+  Form_ListView_Post_Client.ListView1.Cursor := crDefault;
+end;
+
+procedure TAction_Module.UnLockPartTimeExecute(Sender: TObject);
+begin
+  Form_ListView_Post_Client.ListView1.Cursor := crHourGlass;
+  UnitObjets_Active.User := TUser.Create(UnitObjets_Active, 'undefined');
+  UnitObjets_Active.Use := TUse.Create(UnitObjets_Active.Post_Client, UnitObjets_Active.User, UnitObjets_Active);
+  Form_Limitation_Time := TForm_Limitation_Time.Create(Application);
+  if Form_Limitation_Time.ShowModal = mrOk then
+  begin
+    UnitObjets_Active.Use.Start;
+  end
+  else
+  begin
+    UnitObjets_Active.Use.Free;
+    UnitObjets_Active.Use := nil;
+    UnitObjets_Active.User.Free;
+    UnitObjets_Active.User := nil;
+  end;
+  FreeAndNil(Form_Limitation_Time);
+  Form_ListView_Post_Client.ListView1.Cursor := crDefault;
+end;
+
+procedure TAction_Module.LockCancelExecute(Sender: TObject);
+begin
+  Form_ListView_Post_Client.ListView1.Cursor := crHourGlass;
+  UnitObjets_Active.Use.StopAndCancel;
+  Form_ListView_Post_Client.ListView1.Cursor := crDefault;
+end;
+
+procedure TAction_Module.ShutDownExecute(Sender: TObject);
+begin
+  Form_ListView_Post_Client.ListView1.Cursor := crHourGlass;
+  UnitObjets_Active.Post_Client.ShutDown;
+  Form_ListView_Post_Client.ListView1.Cursor := crDefault;
+end;
+
+procedure TAction_Module.RestartExecute(Sender: TObject);
+begin
+  Form_ListView_Post_Client.ListView1.Cursor := crHourGlass;
+  UnitObjets_Active.Post_Client.Restart;
+  Form_ListView_Post_Client.ListView1.Cursor := crDefault;
+end;
+
+procedure TAction_Module.LockPaymentExecute(Sender: TObject);
+
+begin
+  Form_Payment := TForm_Payment.Create(Form_ListView_Post_Client);
+  if Form_Payment.ShowModal = mrOk then
+  begin
+    Form_ListView_Post_Client.ListView1.Cursor := crHourGlass;
+    UnitObjets_Active.Use.Payment := Form_Payment.Payment;
+    UnitObjets_Active.Use.Terminate;
+    Form_ListView_Post_Client.ListView1.Cursor := crDefault;
+  end;
+  FreeAndNil(Form_Payment);
+end;
+
+procedure TAction_Module.Change_UseExecute(Sender: TObject);
+begin
+  Form_Change_Use := TForm_Change_Use.Create(Application);
+  if Form_Change_Use.ShowModal = mrOk then
+  begin
+    Form_ListView_Post_Client.ListView1.Cursor := crHourGlass;
+    UnitObjets_Active.Post_Client.
+      Change_Use(Form_Change_Use.ListView1.Selected.Data);
+    Form_ListView_Post_Client.ListView1.Cursor := crDefault;
+  end;
+  Form_Change_Use.Free;
+end;
+
+
+procedure ActionEnabledUnlimited; //  «Ìﬁ«› «·œÊ«· ⁄‰œ «·› Õ «·⁄«œÌ
+begin
+  Action_Module.UnLock.Enabled := False;
+  Action_Module.UnLockPartTime.Enabled := False;
+  Action_Module.LockPayment.Enabled := True;
+  Action_Module.LockCancel.Enabled := True;
+  Action_Module.Change_Use.Enabled := True;
+end;
+
+procedure ActionEnabledTimelimited;
+begin
+  Action_Module.UnLock.Enabled := False;
+  Action_Module.UnLockPartTime.Enabled := False;
+  Action_Module.LockPayment.Enabled := True;
+  Action_Module.LockCancel.Enabled := True;
+  Action_Module.Change_Use.Enabled := True;
+end;
+
+procedure ActionEnabledSuspend;
+begin
+  Action_Module.UnLock.Enabled := True;
+  Action_Module.UnLockPartTime.Enabled := True;
+  Action_Module.LockPayment.Enabled := False;
+  Action_Module.LockCancel.Enabled := False;
+  Action_Module.Change_Use.Enabled := False;
+end;
+
+procedure ActionEnabledLock;
+begin
+  Action_Module.UnLock.Enabled := True;
+  Action_Module.UnLockPartTime.Enabled := True;
+  Action_Module.LockPayment.Enabled := False;
+  Action_Module.LockCancel.Enabled := False;
+  Action_Module.Change_Use.Enabled := False;
+end;
+
+procedure ActionDisabled;
+begin
+  Action_Module.ShutDown.Enabled := False;
+  Action_Module.Restart.Enabled := False;
+
+  Action_Module.UnLock.Enabled := False;
+  Action_Module.UnLockPartTime.Enabled := False;
+  Action_Module.LockPayment.Enabled := False;
+  Action_Module.LockCancel.Enabled := False;
+  Action_Module.Change_Use.Enabled := False;
+end;
+
+end.
+

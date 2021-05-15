@@ -1,0 +1,62 @@
+unit Connexion_U;
+
+interface
+
+uses IdTCPServer, IdTCPClient,Type_U;
+
+Type
+  TConnexion = class(TObject)
+  private
+    FAThread: TIdPeerThread;
+    FIdTCPClient: TIdTCPClient;
+    FUnitObjets:TObject;
+    FStateConnect: TStateConnect;
+    procedure SetStateConnect(const Value: TStateConnect);
+  protected
+
+  public
+    constructor Create(VAThread: TIdPeerThread);
+    property AThread: TIdPeerThread read FAThread write FAThread;
+    property IdTCPClient: TIdTCPClient read FIdTCPClient write FIdTCPClient;
+    property UnitObjets: TObject read FUnitObjets write FUnitObjets;
+    property StateConnect: TStateConnect read FStateConnect write SetStateConnect; //    Õ«·… «·≈ ’«·
+    destructor Destroy;
+  end;
+
+implementation
+
+{ TConnexion }
+
+constructor TConnexion.Create(VAThread: TIdPeerThread);
+begin
+  FAThread := VAThread;
+  FidTCPClient := TIdTCPClient.Create(nil);
+
+  FStateConnect := scConnected;
+  with Connexion.idTCPClient do
+  begin
+    Port := 6001;
+    try
+      Connect;
+    except
+    end;
+  end;
+  FStateConnect := scConnected;
+
+end;
+
+procedure TPost_Client_Ser.SetStateConnect(const Value: TStateConnect);
+begin
+  if FStateConnect = Value then Exit;
+  FStateConnect := Value;
+  Change_ImageIndex;
+end;
+
+destructor TConnexion.Destroy;
+begin
+
+end;
+
+end.
+
+ 

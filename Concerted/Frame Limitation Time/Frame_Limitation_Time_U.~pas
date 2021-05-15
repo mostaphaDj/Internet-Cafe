@@ -1,0 +1,204 @@
+unit Frame_Limitation_Time_U;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls,
+  Classes_U;
+
+type
+  TFrame_Limitation_Time = class(TFrame)
+    Label2: TLabel;
+    Label5: TLabel;
+    Label_TimeFin: TLabel;
+    Edit_Cost: TEdit;
+    DateTimePicker_TimeFinVirtual: TDateTimePicker;
+    DateTimePicker_TimeDesired: TDateTimePicker;
+    Image1: TImage;
+    Label1: TLabel;
+    Image5: TImage;
+    Image2: TImage;
+    Image3: TImage;
+    Label3: TLabel;
+    Label4: TLabel;
+    RadioButton1: TRadioButton;
+    RadioButton2: TRadioButton;
+    procedure Edit_CostChange(Sender: TObject);
+    procedure Edit_CostEnter(Sender: TObject);
+    procedure Edit_CostExit(Sender: TObject);
+    procedure DateTimePicker_TimeDesiredChange(Sender: TObject);
+    procedure DateTimePicker_TimeDesiredEnter(Sender: TObject);
+    procedure DateTimePicker_TimeDesiredExit(Sender: TObject);
+    procedure DateTimePicker_TimeFinVirtualChange(Sender: TObject);
+    procedure DateTimePicker_TimeFinVirtualEnter(Sender: TObject);
+    procedure DateTimePicker_TimeFinVirtualExit(Sender: TObject);
+    procedure Edit_CostKeyPress(Sender: TObject; var Key: Char);
+    procedure RadioButton1Click(Sender: TObject);
+  private
+    { DÈclarations privÈes }
+  public
+    { DÈclarations publiques }
+    Undo: Currency; // ﬁÌ„… «· —«Ã⁄
+    procedure Start; // «· Õﬁﬁ „‰ ’Õ… „⁄·Ê„«  «·„ﬂ Ê»… ﬁ»· «·„—Ê— ≈·Ï «·’›Õ… «·„Ê«·Ì…
+    procedure Prior; // ··Œ·›
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses DateUtils, Char_U, Form_Welcoming_U, Type_U, IdTCPConnection;
+
+{$R *.dfm}
+
+procedure TFrame_Limitation_Time.Edit_CostChange(Sender: TObject);
+resourcestring
+  MsgText = '«·„»·€ Ì ⁄œÏ 120000 œÃ ' + #13 +
+    'Õœœ „»·€ √ﬁ·';
+begin
+  if Edit_Cost.text <> '' then
+  begin
+    if StrToInt(Edit_Cost.text) <= 119500 then
+    begin
+      UnitObjets_Active.Use.CostVirtual := StrToInt(Edit_Cost.text);
+      DateTimePicker_TimeDesired.DateTime := UnitObjets_Active.Use.TimeDesired;
+      DateTimePicker_TimeFinVirtual.DateTime := UnitObjets_Active.Use.TimeFinVirtual;
+    end
+    else MessageBox(Application.Handle, PChar(MsgText), PChar(MsgCaptionWarning), MB_OK + MsgType);
+  end else Edit_Cost.text := CurrToStr(Undo);
+end;
+
+procedure TFrame_Limitation_Time.Edit_CostEnter(Sender: TObject);
+begin
+  Edit_Cost.OnChange := Edit_CostChange;
+end;
+
+procedure TFrame_Limitation_Time.Edit_CostExit(Sender: TObject);
+begin
+  Edit_Cost.OnChange := nil;
+end;
+
+
+procedure TFrame_Limitation_Time.DateTimePicker_TimeDesiredChange(
+  Sender: TObject);
+begin
+  UnitObjets_Active.Use.TimeDesired := DateTimePicker_TimeDesired.DateTime;
+  Edit_Cost.Text := CurrToStr(UnitObjets_Active.Use.CostVirtual);
+  DateTimePicker_TimeFinVirtual.DateTime := UnitObjets_Active.Use.TimeFinVirtual;
+end;
+
+procedure TFrame_Limitation_Time.DateTimePicker_TimeDesiredEnter(
+  Sender: TObject);
+begin
+  DateTimePicker_TimeDesired.OnChange := DateTimePicker_TimeDesiredChange;
+end;
+
+procedure TFrame_Limitation_Time.DateTimePicker_TimeDesiredExit(
+  Sender: TObject);
+begin
+  DateTimePicker_TimeDesired.OnChange := nil;
+end;
+
+procedure TFrame_Limitation_Time.DateTimePicker_TimeFinVirtualChange(
+  Sender: TObject);
+begin
+  if DateTimePicker_TimeFinVirtual.DateTime > Now + 1 then DateTimePicker_TimeFinVirtual.Date := Now;
+  if DateTimePicker_TimeFinVirtual.DateTime < Now then DateTimePicker_TimeFinVirtual.Date := Now + 1;
+
+  UnitObjets_Active.Use.TimeFinVirtual := DateTimePicker_TimeFinVirtual.DateTime; ;
+  Edit_Cost.Text := CurrToStr(UnitObjets_Active.Use.CostVirtual);
+  DateTimePicker_TimeFinVirtual.DateTime := UnitObjets_Active.Use.TimeDesired;
+end;
+
+procedure TFrame_Limitation_Time.DateTimePicker_TimeFinVirtualEnter(
+  Sender: TObject);
+begin
+  DateTimePicker_TimeFinVirtual.OnChange := DateTimePicker_TimeFinVirtualChange;
+end;
+
+procedure TFrame_Limitation_Time.DateTimePicker_TimeFinVirtualExit(Sender: TObject);
+begin
+  DateTimePicker_TimeFinVirtual.OnChange := nil;
+end;
+
+procedure TFrame_Limitation_Time.Start;
+resourcestring
+  MsgText = '·„  Õœœ «·„œ… Â·  —ÌÌœ «·„ «»⁄… »Êﬁ  €Ì— „ÕœÊœ';
+begin
+  if RadioButton1.Checked then
+  begin
+    if StrToCurr(Edit_Cost.Text) = 0 then
+    begin
+      if MessageBox(Application.Handle, PChar(MsgText), PChar(MsgCaptionWarning), MB_YESNO + MB_ICONWARNING + MB_DEFBUTTON2 + MB_SYSTEMMODAL + MB_RIGHT + MB_RTLREADING) = IDYES then
+      begin
+        UnitObjets_Active.Use.TimeDesired := 0;
+        UnitObjets_Active.Use.State := suTimeUnlimited;
+        Form_Welcoming.Notebook1.ActivePage := 'Page_Demand_Use';
+        Form_Welcoming.Button_Next.Enabled := False;
+        Form_Welcoming.Button_Prior.Enabled := False;
+        UnitObjets_Active.User.Demand_Use;
+      end;
+    end
+    else
+    begin
+      UnitObjets_Active.Use.State := suTimelimited;
+      Form_Welcoming.Notebook1.ActivePage := 'Page_Demand_Use';
+      Form_Welcoming.Button_Next.Enabled := False;
+      Form_Welcoming.Button_Prior.Enabled := False;
+      UnitObjets_Active.User.Demand_Use;
+    end;
+  end
+  else
+  begin
+    UnitObjets_Active.Use.TimeDesired := 0;
+    UnitObjets_Active.Use.State := suTimeUnlimited;
+    Form_Welcoming.Notebook1.ActivePage := 'Page_Demand_Use';
+    Form_Welcoming.Button_Next.Enabled := False;
+    Form_Welcoming.Button_Prior.Enabled := False;
+    UnitObjets_Active.User.Demand_Use;
+  end;
+
+end;
+
+procedure TFrame_Limitation_Time.Edit_CostKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+  if Form_Welcoming <> nil then
+  begin
+    if not CharNumber(Key) then
+    begin
+      key := #0;
+      Form_Welcoming.Label_Message.Left := TWinControl(Sender).Left + 8;
+      Form_Welcoming.Label_Message.Top := TWinControl(Sender).Top + 8 + 22;
+      Form_Welcoming.Label_Message.Visible := True;
+    end else Form_Welcoming.Label_Message.Visible := False;
+  end;
+
+end;
+
+constructor TFrame_Limitation_Time.Create(AOwner: TComponent);
+begin
+  inherited;
+  DateTimePicker_TimeFinVirtual.DateTime := Now;
+end;
+
+destructor TFrame_Limitation_Time.Destroy;
+begin
+  inherited;
+end;
+
+procedure TFrame_Limitation_Time.Prior;
+begin
+  Form_Welcoming.Notebook1.ActivePage := 'Page_Password';
+end;
+
+procedure TFrame_Limitation_Time.RadioButton1Click(Sender: TObject);
+begin
+  DateTimePicker_TimeFinVirtual.Enabled := RadioButton1.Checked;
+  DateTimePicker_TimeDesired.Enabled := RadioButton1.Checked;
+  Edit_Cost.Enabled := RadioButton1.Checked;
+end;
+
+end.
+

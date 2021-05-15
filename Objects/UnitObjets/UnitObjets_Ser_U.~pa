@@ -1,0 +1,153 @@
+unit UnitObjets_Ser_U;
+
+interface
+
+uses Classes, SysUtils, ComCtrls, IdTCPServer,
+  UnitObjets_Concerted_U, Post_Client_Ser_U, User_Ser_U, Use_Ser_U, Connexion_Ser_U
+  , Connexion_Module_U, Post_Client_Concerted_U, Use_Concerted_U, User_Concerted_U;
+
+type
+  TUnitObjets_Ser = class(TUnitObjets_Concerted)
+  private
+    procedure SetPost_Client(const Value: TPost_Client_Concerted); override;
+    procedure SetUse(const Value: TUse_Concerted); override;
+    procedure SetUser(const Value: TUser_Concerted); override;
+  protected
+
+  public
+    constructor Create(VAThread: TIdPeerThread); override;
+    procedure Change_ImageIndex; //  TListItem   €ÌÌ— ’Ê—…
+    destructor Destroy; override;
+  end;
+
+  TListUnitObjets = class(TList)
+  private
+//    function Get(Index: Integer): TUnitObjets;
+//    procedure Put(Index: Integer; const Value: TUnitObjets);
+  public
+//    property Items[Index: Integer]: TUnitObjets read Get write Put; default;
+    function ChercherPostName(PostName: string): Integer;
+  end;
+
+
+implementation
+
+uses Form_ListView_Post_Client_U, Type_U;
+
+{ TUnitObjets }
+
+constructor TUnitObjets_Ser.Create(VAThread: TIdPeerThread);
+begin
+  inherited;
+  Post_Client.HostName := FConnexion.AThread.Connection.Socket.LocalName;
+end;
+
+destructor TUnitObjets_Ser.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TUnitObjets_Ser.SetPost_Client(const Value: TPost_Client_Concerted);
+resourcestring
+  void = 'void';
+var
+  FItem: TListItem;
+begin
+  inherited;
+  FPost_Client.Connexion := FConnexion;
+  FItem := TListItem.Create(Form_ListView_Post_Client.ListView1.Items);
+  TPost_Client_Ser(Post_Client).Item := FItem;
+  with FItem do
+  begin
+    Data := Self;
+    if TUnitObjets_Ser(Data).User <> nil then
+    begin
+      SubItems.add(TUnitObjets_Ser(Data).User.Name);
+      SubItems.add(TUnitObjets_Ser(Data).User.Prename);
+      if TUnitObjets_Ser(Data).Use <> nil then
+      begin
+        SubItems.add(CurrToStr(TUnitObjets_Ser(Data).Use.PriceHour));
+        SubItems.add(timeToStr(TUnitObjets_Ser(Data).Use.TimeStart));
+        SubItems.add(timeToStr(TUnitObjets_Ser(Data).Use.TimeStart));
+        SubItems.add(timeToStr(TUnitObjets_Ser(Data).Use.TimeFinVirtual));
+        SubItems.add(timeToStr(TUnitObjets_Ser(Data).Use.TimeUtilize));
+        SubItems.add(timeToStr(TUnitObjets_Ser(Data).Use.TimeDesired));
+        SubItems.add(CurrToStr(TUnitObjets_Ser(Data).Use.Cost));
+       // SubItems.add(CurrToStr(TUnitObjets(Data).Use.CostTotal));  ·„ Ìﬂ „· »⁄œ
+        SubItems.add(CurrToStr(TUnitObjets_Ser(Data).Use.Payment));
+      end;
+    end
+    else
+    begin
+      SubItems.add(void);
+      SubItems.add(void);
+    end;
+  end;
+  Form_ListView_Post_Client.ListView1.Items.AddItem(FItem, 1);
+  FItem.Caption := FPost_Client.HostName;
+end;
+
+procedure TUnitObjets_Ser.SetUse(const Value: TUse_Concerted);
+begin
+  inherited;
+
+end;
+
+procedure TUnitObjets_Ser.SetUser(const Value: TUser_Concerted);
+begin
+  inherited;
+
+end;
+
+procedure TUnitObjets_Ser.Change_ImageIndex; //  TListItem   €ÌÌ— ’Ê—…
+begin
+(*
+  if Form_ListView_Post_Client.ListView1 <> nil then
+  begin
+    if (FUse = nil) and (FStateConnect = scConnected) then FItem.ImageIndex := 1 else
+      if (FUse = nil) and (FStateConnect = scUnbeknownDisconnect) then FItem.ImageIndex := 2 else
+        if (FUse = nil) and (FStateConnect = scShutDown) then FItem.ImageIndex := 3 else
+          if (FUse = nil) and (FStateConnect = scReturn) then FItem.ImageIndex := 4 else
+
+            if (FUse <> nil) and (FStateConnect = scConnected) then FItem.ImageIndex := 5 else
+              if (FUse <> nil) and (FStateConnect = scUnbeknownDisconnect) then FItem.ImageIndex := 6 else
+                if (FUse <> nil) and (FStateConnect = scShutDown) then FItem.ImageIndex := 7 else
+                  if (FUse <> nil) and (FStateConnect = scReturn) then FItem.ImageIndex := 8 else
+
+                    if (FUse <> nil) and (FStateConnect = scConnected) then FItem.ImageIndex := 9 else
+                      if (FUse <> nil) and (FStateConnect = scUnbeknownDisconnect) then FItem.ImageIndex := 10 else
+                        if (FUse <> nil) and (FStateConnect = scShutDown) then FItem.ImageIndex := 11 else
+                          if (FUse <> nil) and (FStateConnect = scReturn) then FItem.ImageIndex := 12 else
+  end; *)
+end;
+
+{ TListUnitObjets }
+
+{function TListUnitObjets.Get(Index: Integer): TUnitObjets;
+begin
+  inherited Get(Index);
+
+end;
+
+procedure TListUnitObjets.Put(Index: Integer; const Value: TUnitObjets);
+begin
+  inherited Put(Index, Value);
+
+end; }
+
+function TListUnitObjets.ChercherPostName(PostName: string): Integer;
+var
+  PostIndex: Integer;
+begin
+  Result := -1;
+  for PostIndex := 0 to Count - 1 do
+  begin
+    if PostName = TUnitObjets_Ser(Items[PostIndex]).Post_Client.HostName then
+    begin
+      Result := PostIndex;
+    end;
+  end;
+end;
+
+end.

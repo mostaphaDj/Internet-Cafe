@@ -1,0 +1,36 @@
+unit Form_Main_U;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, IdBaseComponent, ShellAPI,
+  ExtCtrls, IdTCPServer,
+  Frame_Cost_U;
+type
+  TForm_Main = class(TForm)
+    Button1: TButton;
+    ListBox1: TListBox;
+    procedure Button1Click(Sender: TObject);
+  private
+    { Déclarations privées }
+  public
+    { Déclarations publiques }
+  end;
+
+var
+  Form_Main: TForm_Main;
+
+implementation
+
+uses Math, Conect_Thead_U, Connexion_Module_U,
+  Form_Lock_U, Post_Client_Cli_U, Classes_U;
+
+{$R *.dfm}
+
+procedure TForm_Main.Button1Click(Sender: TObject);
+begin
+  UnitObjets_Active.Post_Client := TPost_Client.Create;
+end;
+
+end.

@@ -1,0 +1,25 @@
+unit Data_Module_ImageList_U;
+
+interface
+
+uses
+  SysUtils, Classes, ImgList, Controls;
+
+type
+  TData_Module_ImageList = class(TDataModule)
+    ImageListSmallPost: TImageList;
+    ImageListLargePost: TImageList;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Data_Module_ImageList: TData_Module_ImageList;
+
+implementation
+
+{$R *.dfm}
+
+end.

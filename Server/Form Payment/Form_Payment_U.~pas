@@ -1,0 +1,45 @@
+unit Form_Payment_U;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ExtCtrls,
+  Frame_Cost_U;
+type
+  TForm_Payment = class(TForm)
+    Panel1: TPanel;
+    Ok: TButton;
+    Cancel: TButton;
+    Panel2: TPanel;
+    Edit_Payment: TEdit;
+    Label_Payment: TLabel;
+    Label10: TLabel;
+    Edit_CostTotale: TEdit;
+    Frame_Cost: TFrame_Cost;
+    procedure FormCreate(Sender: TObject);
+  private
+    { DÈclarations privÈes }
+
+  public
+    { DÈclarations publiques }
+    Payment: Integer;
+  end;
+
+var
+  Form_Payment: TForm_Payment;
+
+implementation
+
+uses Form_Main_U, Form_ListView_Post_Client_U,
+  Connexion_Module_U, ComCtrls, Data_Module_U;
+
+{$R *.dfm}
+
+procedure TForm_Payment.FormCreate(Sender: TObject);
+begin
+  Edit_CostTotale.Text := CurrToStr(Use_Active.Cost - User_Active.Computation); {„»€ «·œ›⁄⁄ „»·€ Â–Â «·Ã·”… + «·œÌ‰}
+  Frame_Cost_U.Frame_Cost := Self.Frame_Cost;
+end;
+
+end.

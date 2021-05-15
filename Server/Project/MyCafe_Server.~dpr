@@ -1,0 +1,52 @@
+program MyCafe_Server;
+
+uses
+  Forms,
+  Form_ListView_Post_Client_U in '..\Form ListView Post Client\Form_ListView_Post_Client_U.pas' {Form_ListView_Post_Client},
+  Connexion_Module_U in '..\Connexion Module\Connexion_Module_U.pas' {Connexion_Module: TDataModule},
+  Form_Main_U in '..\Form Main\Form_Main_U.pas' {Form_Main},
+  Data_Module_U in '..\Data Module\Data_Module_U.pas' {Data_Module: TDataModule},
+  Action_Module_U in '..\Action Module\Action_Module_U.pas' {Action_Module: TDataModule},
+  Form_Payment_U in '..\Form Payment\Form_Payment_U.pas' {Form_Payment},
+  Use_Ser_U in '..\..\Objects\Use\Use_Ser_U.pas',
+  Use_Concerted_U in '..\..\Objects\Use\Use_Concerted_U.pas',
+  User_Concerted_U in '..\..\Objects\User\User_Concerted_U.pas',
+  Post_Client_Ser_U in '..\..\Objects\Post Client\Post_Client_Ser_U.pas',
+  Post_Client_Concerted_U in '..\..\Objects\Post Client\Post_Client_Concerted_U.pas',
+  Form_Change_Use_U in '..\Form Change Use\Form_Change_Use_U.pas' {Form_Change_Use},
+  Frame_Cost_U in '..\..\Concerted\Frame Cost\Frame_Cost_U.pas' {Frame_Cost: TFrame},
+  Round_U in '..\..\Objects\Round\Round_U.pas',
+  Frame_Limitation_Time_U in '..\..\Concerted\Frame Limitation Time\Frame_Limitation_Time_U.pas' {Frame_Limitation_Time: TFrame},
+  User_Ser_U in '..\..\Objects\User\User_Ser_U.pas',
+  Char_U in '..\..\Concerted\Char\Char_U.pas',
+  Form_Welcoming_U in '..\..\Concerted\Form Welcoming\Form_Welcoming_U.pas' {Form_Welcoming},
+  Frame_Password_U in '..\..\Concerted\Frame Password\Frame_Password_U.pas' {Frame_Password: TFrame},
+  Frame_Demand_Use_U in '..\..\Concerted\Frames Recording\Frame_Demand_Use_U.pas' {Frame_Demand_Use: TFrame},
+  Frame_Recording1_U in '..\..\Concerted\Frames Recording\Frame_Recording1_U.pas' {Frame_Recording1: TFrame},
+  Frame_Recording2_U in '..\..\Concerted\Frames Recording\Frame_Recording2_U.pas' {Frame_Recording2: TFrame},
+  Frame_Recording3_U in '..\..\Concerted\Frames Recording\Frame_Recording3_U.pas' {Frame_Recording3: TFrame},
+  Data_Module_ImageList_U in '..\Form ListView Post Client\List Image\Data_Module_ImageList_U.pas' {Data_Module_ImageList: TDataModule},
+  Form_Limitation_Time_U in '..\..\Concerted\Frame Limitation Time\Form_Limitation_Time_U.pas' {Form_Limitation_Time},
+  Rate_U in '..\..\Objects\Rate\Rate_U.pas',
+  Form_Demand_Use_U in '..\Form Demand Use\Form_Demand_Use_U.pas' {Form_Demand_Use},
+  UnitObjets_Ser_U in '..\..\Objects\UnitObjets\UnitObjets_Ser_U.pas',
+  Connexion_Ser_U in '..\..\Objects\Connexion\Connexion_Ser_U.pas',
+  Connexion_Concerted_U in '..\..\Objects\Connexion\Connexion_Concerted_U.pas',
+  Type_U in '..\..\Objects\Type\Type_U.pas',
+  UnitObjets_Concerted_U in '..\..\Objects\UnitObjets\UnitObjets_Concerted_U.pas',
+  Classes_U in '..\..\Objects\Classes\Classes Ser\Classes_U.pas',
+  Frame_Udit_User_U in '..\..\Concerted\Frame_Udit_User_U.pas' {Frame_Udit_User: TFrame},
+  Form_Monition_U in '..\..\Client\Form Monition\Form_Monition_U.pas' {Form_Monition},
+  Use_Account_U in '..\..\Objects\Use\Use_Account_U.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.Title := 'My Cafe Server';
+  Application.CreateForm(TForm_Main, Form_Main);
+  Application.CreateForm(TData_Module, Data_Module);
+  Application.CreateForm(TData_Module_ImageList, Data_Module_ImageList);
+  Application.Run;
+end.
+

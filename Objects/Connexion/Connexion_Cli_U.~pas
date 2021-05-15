@@ -1,0 +1,42 @@
+unit Connexion_Cli_U;
+
+interface
+
+uses Connexion_Concerted_U, IdTCPServer;
+
+type
+  TConnexion_Cli = class(TConnexion_Concerted)
+  private
+  protected
+
+  public
+    constructor Create; override;
+    procedure Connect(VHost:String); override;
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses Type_U, Conect_Thead_U;
+
+{ TConnexion_Cli }
+
+procedure TConnexion_Cli.Connect(VHost:String);
+begin
+ IdTCPClient.Port := 6000;
+  inherited Connect(VHost);
+end;
+
+constructor TConnexion_Cli.Create;
+begin
+  inherited ;
+
+end;
+
+destructor TConnexion_Cli.Destroy;
+begin
+
+  inherited Destroy;
+end;
+
+end.

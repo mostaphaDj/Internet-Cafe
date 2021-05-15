@@ -1,0 +1,109 @@
+unit Post_Client_Ser_U;
+
+interface
+
+uses Windows, ComCtrls, IdTCPClient, Classes, IdTCPServer, Forms, ADODB, dialogs, Controls,
+  Post_Client_Concerted_U, Type_U;
+
+type
+
+  TPost_Client_Ser = class(TPost_Client_Concerted)
+  private
+    FItem: TListItem;
+    procedure SetItem(const Value: TListItem);
+  public
+    { DÈclarations publiques }
+    {MÈthod}
+    procedure UnLock; overload; //override;
+    procedure Lock; override;
+
+    procedure ShutDown; override;
+    procedure Restart; override;
+
+    procedure Connect; virtual;
+    {property}
+    constructor Create; override;
+    property Item: TListItem read FItem write SetItem;
+    destructor Destroy; override;
+    {EvÈnements}
+  end;
+
+implementation
+
+uses IdTCPConnection, Data_Module_U, SysUtils, Frame_Limitation_Time_U,
+  DB, Action_Module_U, DateUtils, Form_Payment_U,
+  Form_ListView_Post_Client_U;
+
+{ TPost_Client_Ser }
+
+procedure TPost_Client_Ser.UnLock;
+begin
+  inherited;
+  StateLock := slUnLock;
+end;
+
+procedure TPost_Client_Ser.Lock;
+begin
+  inherited;
+  StateLock := slLock;
+end;
+
+procedure TPost_Client_Ser.Restart;
+resourcestring
+  MsgText = 'ÕœÀ Œÿ√ ⁄‰œ „Õ«Ê·… ≈⁄«œ… «· ‘€Ì·';
+begin
+  with Connexion.idTCPClient do
+  begin
+    try
+      Writeln('Restart');
+    except
+      on E: Exception do
+      begin
+        MessageBox(Application.Handle, PChar(MsgText + #13 +
+          E.Message), PChar(MsgCaptionError), MB_OK + MsgType);
+      end;
+    end;
+  end;
+end;
+
+procedure TPost_Client_Ser.ShutDown;
+resourcestring
+  MsgText = 'ÕœÀ Œÿ√ ⁄œ „Õ«Ê·… ≈ﬁ«› «· Ã€Ì·';
+begin
+  with Connexion.idTCPClient do
+  begin
+    try
+      Writeln('ShutDown');
+    except
+      on E: Exception do
+      begin
+        MessageBox(Application.Handle, PChar(MsgText + #13 +
+          E.Message), PChar(MsgCaptionError), MB_OK + MsgType);
+      end;
+    end;
+  end;
+end;
+
+destructor TPost_Client_Ser.Destroy;
+begin
+  inherited Destroy;
+
+end;
+
+constructor TPost_Client_Ser.Create;
+begin
+  inherited;
+end;
+
+procedure TPost_Client_Ser.SetItem(const Value: TListItem);
+begin
+  if FItem = Value then Exit;
+  FItem := Value;
+end;
+
+procedure TPost_Client_Ser.Connect;
+begin
+
+end;
+
+end.

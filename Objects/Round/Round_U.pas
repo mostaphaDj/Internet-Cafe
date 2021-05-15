@@ -1,0 +1,183 @@
+unit Round_U;
+
+interface
+
+uses
+  Windows, Forms, Type_U;
+
+type
+  TRound = class(TObject) // ßÇÆä ÇáÊÑÌíÍ
+  private
+    FUnitRound: Currency;
+    FValueNiveauRound: Currency;
+    FValue: Currency;
+    FValueRound: Currency;
+    FPercentageNiveauRound: Single;
+
+    procedure SetValueNiveauRound(const Value: Currency);
+    procedure SetUnitRound(const Value: Currency);
+    procedure SetPercentageNiveauRound(const Value: Single);
+    function GetValueRound: Currency;
+  public
+    function Round(Value: Currency): Currency; // ÊÑÌíÍ ÇáŞíãÉ
+    property Value: Currency read FValue write FValue; // ÇáãÈáÛ
+    property ValueRound: Currency read GetValueRound; // ÇáãÈáÛ ÇáãÑÌÍ
+    property UnitRound: Currency read FUnitRound write SetUnitRound;
+    // ŞíãÉ ÇáÊÑÌíÍ
+    property ValueNiveauRound: Currency read FValueNiveauRound write
+      SetValueNiveauRound; // ŞíãÉ ÇŞá ÍÓÇÑÉ
+    property PercentageNiveauRound: Single read FPercentageNiveauRound write
+      SetPercentageNiveauRound; // äÓÈÉ ÃŞá ÎÓÇÑÉ
+  end;
+
+implementation
+
+uses SysUtils, Math;
+
+{ TRoundPrice }
+
+function TRound.Round(Value: Currency): Currency;
+var
+  FCostInt, FValueRoundInt, FValueNiveauRoundInt, FRemainderInt: int64;
+  FFractional: Byte; // ãä ÃÌá ÇáÊÍæíá ÇáÃÚÏÇÏ ÇáÍŞíŞíÉ Çáì ÕÍíÍÉ íÍÊæí Şíã ãÖÇÚİÉ áá 10
+
+  procedure CurrToInt; // ÊÍæíá ãä ÇáŞíãÉ ãä ÚÏÏ ÍŞíŞí Çáì ÚÏÏ ÕÍíÍ
+
+    function FractionalMax: Byte; // ÇáÚÏÏ ÇáÃÈÑ ÈÚÏ ÇáİÇÕáÉ
+
+      function FractionalNumber(Value: Currency): Byte; // function FractionalNumber(Value: Currency): Byte; // ÚÏÏ ÇáÃÑŞÇã ÈÚÏ ÇáİÇÕÉ
+      var
+        i: Byte;
+        ValueStr: string;
+      begin
+        Result := 0;
+        ValueStr := CurrToStr(Value);
+        for i := 1 to Length(ValueStr) do
+        begin
+          if ValueStr[i] = '.' then
+          begin
+            Result := Length(ValueStr) - i + 1;
+          end;
+        end;
+      end;
+
+    begin
+      if FractionalNumber(FValue) <= FractionalNumber(FUnitRound) then
+      begin
+        Result := FractionalNumber(FValue);
+      end
+      else
+      begin
+        FractionalMax := FractionalNumber(FUnitRound);
+      end;
+      if Result < FractionalNumber(FValueNiveauRound) then
+      begin
+        Result := FractionalNumber(FValueNiveauRound);
+      end;
+    end;
+
+  var
+    i: Byte;
+  begin
+    FFractional := 1;
+    for i := 1 to FractionalMax do
+    begin
+      FFractional := FFractional * 10;
+    end;
+    FCostInt := System.Round(FValue * FFractional);
+    FValueRoundInt := System.Round(FUnitRound * FFractional);
+    FValueNiveauRoundInt := System.Round(FValueNiveauRound * FFractional);
+  end;
+
+begin
+  FValue := Value;
+  CurrToInt;
+  FRemainderInt := (FCostInt mod FValueRoundInt);
+
+  if FCostInt >= 0 then
+  begin
+    if FRemainderInt < FValueNiveauRoundInt then
+    begin
+      FValueRound := (FCostInt - FRemainderInt) / FFractional;
+    end
+    else
+    begin
+      FValueRound := (FCostInt + (FValueRoundInt - FRemainderInt))
+        / FFractional;
+    end;
+  end
+  else
+  begin
+    if FRemainderInt >= -FValueNiveauRoundInt then
+    begin
+      FValueRound := (FCostInt - FRemainderInt) / FFractional;
+    end
+    else
+    begin
+      FValueRound := (FCostInt - (FValueRoundInt + FRemainderInt))
+        / FFractional;
+    end;
+  end;
+  Result := FValueRound;
+end;
+
+procedure TRound.SetValueNiveauRound(const Value: Currency);
+resourcestring
+  MsgCaption1 = 'ŞíãÉ ãÓÊæì ÇáÊÑÌíÍ';
+  MsgText1 = 'áÇ íãßä Ãä Êßæä ŞíãÉ ãÓÊæì ÇáÊÑÌíÍ  ÃßÈÑ ãä ŞíãÉ ÇáÊÑÌíÍ';
+  MsgCaption2 = 'ŞíãÉ ÓÇáÈÉ';
+  MsgText2 = 'áÇ íãßä Ãä Êßæä ŞíãÉ ãÓÊæì ÇáÊÑÌíÍ  ÓÇáÈÉ';
+begin
+  if (Value > FUnitRound) then
+  begin
+    MessageBox(Application.Handle, PChar(MsgText1), PChar(MsgCaption1),
+      $180000);
+    Exit;
+  end;
+  if (Value < 0) then
+  begin
+    MessageBox(Application.Handle, PChar(MsgText2), PChar(MsgCaption2),
+      $180000);
+    Exit;
+  end;
+  FValueNiveauRound := Value;
+  FPercentageNiveauRound := RoundTo((FValueNiveauRound * 100) / FUnitRound, -2);
+end;
+
+procedure TRound.SetUnitRound(const Value: Currency);
+resourcestring
+  MsgCaption3 = 'ŞíãÉ ÓÇáÈÉ';
+  MsgText3 = 'áÇ íãßä Ãä Êßæä ŞíãÉ  ÇáÊÑÌíÍ  ÓÇáÈÉ';
+begin
+  if (Value < 0) then
+  begin
+    MessageBox(Application.Handle, PChar(MsgText3), PChar(MsgCaption3),
+      $180000);
+    Exit;
+  end;
+
+  FUnitRound := Value;
+  FValueNiveauRound := (FUnitRound * FPercentageNiveauRound) / 100;
+end;
+
+procedure TRound.SetPercentageNiveauRound(const Value: Single);
+resourcestring
+  MsgCaption4 = 'ŞíãÉ ãÓÊæì ÇáÊÑÌíÍ';
+  MsgText4 = 'ŞíãÉ ãÓÊæì ÇáÊÑÌíÍ ãÍÕæÑÉ Èíä 0 .. 100';
+begin
+  if (Value > 100) or (Value < 0) then
+  begin
+    MessageBox(Application.Handle, PChar(MsgText4), PChar(MsgCaption4),
+      $180000);
+    Exit;
+  end;
+  FPercentageNiveauRound := Value;
+  FValueNiveauRound := RoundTo((FUnitRound * FPercentageNiveauRound) / 100, -2);
+end;
+
+function TRound.GetValueRound: Currency;
+begin
+  Result := Round(FValue);
+end;
+
+end.

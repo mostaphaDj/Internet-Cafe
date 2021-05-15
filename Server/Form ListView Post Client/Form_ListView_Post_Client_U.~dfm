@@ -1,0 +1,230 @@
+object Form_ListView_Post_Client: TForm_ListView_Post_Client
+  Left = 218
+  Top = 144
+  Width = 503
+  Height = 435
+  Caption = 'Lock Cancel '#1594#1604#1602
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  FormStyle = fsMDIChild
+  OldCreateOrder = False
+  Position = poDefault
+  Visible = True
+  WindowState = wsMaximized
+  OnClose = FormClose
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object ListView1: TListView
+    Left = 0
+    Top = 41
+    Width = 495
+    Height = 360
+    Align = alClient
+    BiDiMode = bdLeftToRight
+    Columns = <
+      item
+        Caption = 'PC'
+      end
+      item
+        Caption = 'Prename (User) '#1575#1604#1575#1587#1605
+        Width = 120
+      end
+      item
+        Caption = 'Name(User) '#1604#1602#1576' '#1575#1604#1605#1587#1578#1582#1583#1605
+        Width = 140
+      end
+      item
+        Caption = 'PriceHour '#1579#1605#1606' '#1575#1604#1587#1575#1593#1577
+        Width = 120
+      end
+      item
+        Caption = 'TimeStart '#1608#1602#1578' '#1575#1604#1576#1583#1569' '
+        Width = 110
+      end
+      item
+        Caption = 'TimeFinVirtual '#1608#1602#1578' '#1575#1604#1575#1606#1578#1607#1575#1569' '#1575#1604#1605#1601#1578#1585#1590' '
+        Width = 190
+      end
+      item
+        Caption = 'TimeUtilize '#1575#1604#1608#1602#1578' '#1575#1604#1605#1587#1578#1582#1583#1605
+        Width = 140
+      end
+      item
+        Caption = 'TimeDesired '#1575#1604#1608#1602#1578' '#1575#1604#1605#1591#1604#1608#1576
+        Width = 150
+      end
+      item
+        Caption = 'CostVirtual '#1575#1604#1605#1576#1604#1594' '#1575#1604#1605#1601#1578#1585#1590
+        Width = 140
+      end
+      item
+        Caption = 'Cost '#1605#1576#1604#1594' '#1575#1604#1580#1604#1587#1577
+        Width = 100
+      end
+      item
+        Caption = 'CostTotal '#1575#1604#1605#1576#1604#1594' '#1575#1604#1575#1580#1605#1575#1604#1610
+        Width = 140
+      end
+      item
+        Caption = 'Payment '#1575#1604#1605#1576#1604#1594' '#1575#1604#1605#1583#1601#1608#1593
+        Width = 130
+      end>
+    GridLines = True
+    LargeImages = Data_Module_ImageList.ImageListLargePost
+    ParentBiDiMode = False
+    SmallImages = Data_Module_ImageList.ImageListSmallPost
+    TabOrder = 0
+    OnContextPopup = ListView1ContextPopup
+    OnDblClick = ListView1DblClick
+    OnResize = ListView1Resize
+    OnSelectItem = ListView1SelectItem
+  end
+  object ToolBar1: TToolBar
+    Left = 0
+    Top = 0
+    Width = 495
+    Height = 41
+    ButtonHeight = 36
+    ButtonWidth = 31
+    Caption = 'ToolBar1'
+    Images = Action_Module.ImageList1
+    TabOrder = 1
+    Visible = False
+    object ToolButton1: TToolButton
+      Left = 0
+      Top = 2
+      Action = Action_Module.UnLock
+    end
+    object ToolButton2: TToolButton
+      Left = 31
+      Top = 2
+      Action = Action_Module.UnLockPartTime
+    end
+    object ToolButton3: TToolButton
+      Left = 62
+      Top = 2
+      Action = Action_Module.LockPayment
+    end
+    object ToolButton4: TToolButton
+      Left = 93
+      Top = 2
+      Action = Action_Module.LockCancel
+    end
+    object ToolButton5: TToolButton
+      Left = 124
+      Top = 2
+      Action = Action_Module.Change_Use
+    end
+    object ToolButton8: TToolButton
+      Left = 155
+      Top = 2
+      Width = 8
+      Caption = 'ToolButton8'
+      ImageIndex = 7
+      Style = tbsSeparator
+    end
+    object ToolButton6: TToolButton
+      Left = 163
+      Top = 2
+      Action = Action_Module.ShutDown
+    end
+    object ToolButton7: TToolButton
+      Left = 194
+      Top = 2
+      Action = Action_Module.Restart
+    end
+  end
+  object PopupMenuPost: TPopupMenu
+    Images = Action_Module.ImageList1
+    Left = 344
+    Top = 288
+    object Active: TMenuItem
+      Action = Action_Module.UnLock
+    end
+    object ActivePartTime1: TMenuItem
+      Action = Action_Module.UnLockPartTime
+    end
+    object Payment: TMenuItem
+      Action = Action_Module.LockPayment
+    end
+    object DesActive1: TMenuItem
+      Action = Action_Module.LockCancel
+    end
+    object Chonge1: TMenuItem
+      Action = Action_Module.Change_Use
+    end
+    object ShutDown1: TMenuItem
+      Action = Action_Module.ShutDown
+    end
+    object Restart: TMenuItem
+      Action = Action_Module.Restart
+    end
+  end
+  object PopupMenuListViewShowPost: TPopupMenu
+    Left = 376
+    Top = 288
+    object Now1: TMenuItem
+      Caption = 'Add Now Post'
+    end
+    object View2: TMenuItem
+      Caption = 'Icon'
+      object ViewStyleChange1: TMenuItem
+        AutoCheck = True
+        Caption = 'Icon'
+        ImageIndex = 0
+        RadioItem = True
+        OnClick = ViewStyleChange1Click
+      end
+      object ViewStyleChange2: TMenuItem
+        Tag = 1
+        AutoCheck = True
+        Caption = 'SmallIcon'
+        ImageIndex = 1
+        RadioItem = True
+        OnClick = ViewStyleChange1Click
+      end
+      object btnList: TMenuItem
+        Tag = 2
+        AutoCheck = True
+        Caption = 'btnList'
+        ImageIndex = 2
+        RadioItem = True
+        OnClick = ViewStyleChange1Click
+      end
+      object ViewStyleChange4: TMenuItem
+        Tag = 3
+        AutoCheck = True
+        Caption = 'Report'
+        ImageIndex = 3
+        RadioItem = True
+        OnClick = ViewStyleChange1Click
+      end
+    end
+    object Refresh: TMenuItem
+      Caption = 'Refresh'
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object Hide1: TMenuItem
+      AutoCheck = True
+      Caption = 'Hide Post Shot Down'
+    end
+    object HidePostX1: TMenuItem
+      AutoCheck = True
+      Caption = 'Hide Post X'
+    end
+  end
+  object TimerPayment: TTimer
+    Enabled = False
+    Interval = 60000
+    OnTimer = TimerPaymentTimer
+    Left = 408
+    Top = 288
+  end
+end

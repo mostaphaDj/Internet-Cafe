@@ -1,0 +1,147 @@
+unit UnitObjets_U;
+
+interface
+
+uses Classes, SysUtils, ComCtrls,IdTCPServer,
+  Post_Client_Ser_U, User_Ser_U, Use_Ser_U,Connexion_U;
+
+type
+  TUnitObjets = class(TObject)
+  private
+    FPost_Client: TPost_Client_Ser;
+    FUse: TUse_Ser;
+    FUser: TUser_Ser;
+    FConnexion: TConnexion;
+    procedure SetPost_Client(const Value: TPost_Client_Ser);
+    procedure SetUse(const Value: TUse_Ser);
+    procedure SetUser(const Value: TUser_Ser);
+  protected
+
+  public
+    constructor Create(VPost_Client: TPost_Client_Ser; VUser: TUser_Ser; VUse: TUse_Ser;VAThread: TIdPeerThread);
+    property Post_Client: TPost_Client_Ser read FPost_Client write SetPost_Client;
+    property User: TUser_Ser read FUser write SetUser;
+    property Use: TUse_Ser read FUse write SetUse;
+    property Connexion: TConnexion read FConnexion write FConnexion;
+    destructor Destroy; override;
+  end;
+
+  TListUnitObjets = class(TList)
+  private
+//    function Get(Index: Integer): TUnitObjets;
+//    procedure Put(Index: Integer; const Value: TUnitObjets);
+  public
+//    property Items[Index: Integer]: TUnitObjets read Get write Put; default;
+    function ChercherPostName(PostName: string): Integer;
+  end;
+
+
+implementation
+
+uses Form_ListView_Post_Client_U, Type_U;
+
+{ TUnitObjets }
+
+constructor TUnitObjets.Create(VPost_Client: TPost_Client_Ser;
+  VUser: TUser_Ser; VUse: TUse_Ser;VAThread: TIdPeerThread);
+begin
+  inherited Create(VPost_Client,VUser,VUse,VAThread);
+  Post_Client := VPost_Client; //FPost_Client »œ· „‰   Post_Client „ ⁄„œ
+  User := VUser;
+  Use := VUse; //FUse »œ· „‰   Use „ ⁄„œ
+  FConnexion:=TConnexion.Create(VAThread);
+end;
+
+destructor TUnitObjets.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TUnitObjets.SetPost_Client(const Value: TPost_Client_Ser);
+resourcestring
+  void = 'void';
+var
+  FItem: TListItem;
+begin
+  inherited;
+  if Value = FPost_Client then Exit;
+  FPost_Client := Value;
+  FPost_Client.Connexion:=FConnexion;
+  FItem := TListItem.Create(Form_ListView_Post_Client.ListView1.Items);
+  Post_Client.Item := FItem;
+  with FItem do
+  begin
+    Data := Self;
+    if TUnitObjets(Data).User <> nil then
+    begin
+      SubItems.add(TUnitObjets(Data).User.Name);
+      SubItems.add(TUnitObjets(Data).User.Prename);
+      if TUnitObjets(Data).Use <> nil then
+      begin
+        SubItems.add(CurrToStr(TUnitObjets(Data).Use.PriceHour));
+        SubItems.add(timeToStr(TUnitObjets(Data).Use.TimeStart));
+        SubItems.add(timeToStr(TUnitObjets(Data).Use.TimeStart));
+        SubItems.add(timeToStr(TUnitObjets(Data).Use.TimeFinVirtual));
+        SubItems.add(timeToStr(TUnitObjets(Data).Use.TimeUtilize));
+        SubItems.add(timeToStr(TUnitObjets(Data).Use.TimeDesired));
+        SubItems.add(CurrToStr(TUnitObjets(Data).Use.Cost));
+       // SubItems.add(CurrToStr(TUnitObjets(Data).Use.CostTotal));  ·„ Ìﬂ „· »⁄œ
+        SubItems.add(CurrToStr(TUnitObjets(Data).Use.Payment));
+      end;
+    end
+    else
+    begin
+      SubItems.add(void);
+      SubItems.add(void);
+    end;
+  end;
+  Form_ListView_Post_Client.ListView1.Items.AddItem(FItem, 1);
+  FItem.Caption := FPost_Client.HostName;
+end;
+
+procedure TUnitObjets.SetUse(const Value: TUse_Ser);
+begin
+  inherited;
+  if Value = FUse then Exit;
+  FUse := Value;
+  FUse.Connexion:=FConnexion;
+end;
+
+procedure TUnitObjets.SetUser(const Value: TUser_Ser);
+begin
+  inherited;
+  if Value = FUser then Exit;
+  FUser := Value;
+  FUse.Connexion:=FConnexion;
+end;
+
+{ TListUnitObjets }
+
+{function TListUnitObjets.Get(Index: Integer): TUnitObjets;
+begin
+  inherited Get(Index);
+
+end;
+
+procedure TListUnitObjets.Put(Index: Integer; const Value: TUnitObjets);
+begin
+  inherited Put(Index, Value);
+
+end; }
+
+function TListUnitObjets.ChercherPostName(PostName: string): Integer;
+var
+  PostIndex: Integer;
+begin
+  Result := -1;
+  for PostIndex := 0 to Count - 1 do
+  begin
+    if PostName = TUnitObjets(Items[PostIndex]).Post_Client.HostName then
+    begin
+      Result := PostIndex;
+    end;
+  end;
+end;
+
+end.

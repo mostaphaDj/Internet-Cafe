@@ -1,0 +1,49 @@
+unit Server_U;
+
+interface
+
+uses IdTCPServer,IdTCPClient;
+
+Type
+TServer = class(TObject)
+private
+    FAThread: TIdPeerThread;
+    FidTCPClient: TIdTCPClient;
+    procedure SetAThread(const Value: TIdPeerThread);
+
+protected
+
+public
+    constructor Create(VAThread: TIdPeerThread;VIdTCPClient: TIdTCPClient);override;
+    property IdTCPClient: TIdTCPClient read FidTCPClient;
+    property AThread: TIdPeerThread read FAThread write SetAThread;
+    destructor Destroy;override;
+end;
+
+
+implementation
+
+{ TServer }
+
+{ TServer }
+
+constructor TServer.Create(VAThread: TIdPeerThread;
+  VIdTCPClient: TIdTCPClient);
+begin
+  inherited;
+
+end;
+
+destructor TServer.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TServer.SetAThread(const Value: TIdPeerThread);
+begin
+  FAThread := Value;
+end;
+
+end.
+ 

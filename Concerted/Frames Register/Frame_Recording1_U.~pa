@@ -1,0 +1,360 @@
+unit Frame_Recording1_U;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ExtCtrls, ComCtrls;
+
+type
+  TFrame_Recording1 = class(TFrame)
+    Label6: TLabel;
+    Edit_pseudonyme: TEdit;
+    Label_pseudonyme: TLabel;
+    Label7: TLabel;
+    Edit_Mot_Passe1: TEdit;
+    Label_Mot_De_Passe1: TLabel;
+    Label8: TLabel;
+    Edit_Mot_Passe2: TEdit;
+    Label_Mot_De_Passe2: TLabel;
+    Label1: TLabel;
+    Bevel1: TBevel;
+    Edit_Nam: TEdit;
+    Label3: TLabel;
+    Edit_Prenam: TEdit;
+    Label4: TLabel;
+    Label_Last_Name: TLabel;
+    Label_First_Name: TLabel;
+    Edit_Email: TEdit;
+    Edit_Email2: TEdit;
+    Label_Email: TLabel;
+    Label_Confirm: TLabel;
+    Label9: TLabel;
+    Label10: TLabel;
+    Image2: TImage;
+    Image5: TImage;
+    Image6: TImage;
+    Image1: TImage;
+    Image3: TImage;
+    ImageNam: TImage;
+    ImagePrenam: TImage;
+    ImageEmail: TImage;
+    ImageUsername: TImage;
+    ImagePassword: TImage;
+    ImagePassword2: TImage;
+    ImageEmail2: TImage;
+    procedure Edit_pseudonymeKeyPress(Sender: TObject; var Key: Char);
+    procedure Edit_Mot_Passe1KeyPress(Sender: TObject; var Key: Char);
+    procedure Edit_NamKeyPress(Sender: TObject; var Key: Char);
+    procedure Edit_EmailKeyPress(Sender: TObject; var Key: Char);
+    procedure Edit_NamExit(Sender: TObject);
+    procedure Edit_EmailExit(Sender: TObject);
+    procedure Edit_Email2Exit(Sender: TObject);
+    procedure Edit_pseudonymeExit(Sender: TObject);
+    procedure Edit_Mot_Passe1Exit(Sender: TObject);
+    procedure Edit_PrenamExit(Sender: TObject);
+    procedure Edit_Mot_Passe2Exit(Sender: TObject);
+  private
+    { Private declarations }
+    function Email: Boolean; // «· √ﬂœ „‰ ’Õ… «·≈„Ì·
+  public
+    { Public declarations }
+    procedure Next; // «· Õﬁﬁ „‰ ’Õ… „⁄·Ê„«  «·„ﬂ Ê»… ﬁ»· «·„—Ê— ≈·Ï «·’›Õ… «·„Ê«·Ì…
+    procedure Prior; // ··Œ·›
+  end;
+
+implementation
+
+uses Form_Welcoming_U, Connexion_Module_U, Char_U, Type_U,
+  IdTCPConnection, Classes_U, Data_Module_U;
+
+{$R *.dfm}
+
+function TFrame_Recording1.Email: Boolean; // «· √ﬂœ „‰ ’Õ… «·≈„Ì·
+var
+  I: Integer;
+  B: Boolean;
+begin
+  if Edit_Email.Text <> '' then
+    if CharAnglesh(Edit_Email.Text[1]) then
+    begin
+      for i := 2 to Length(Edit_Email.Text) do
+      begin
+        if (Edit_Email.Text[i] = '@') then
+        begin
+          B := False;
+          if (CharAnglesh(Edit_Email.Text[i + 1])) then
+          begin
+            if copy(Edit_Email.Text, Length(Edit_Email.Text) - 3, Length(Edit_Email.Text)) = '.com' then
+            begin
+              Result := True;
+            end;
+          end;
+        end;
+      end;
+    end;
+end;
+
+procedure TFrame_Recording1.Next;
+resourcestring
+  MsgText1 = '«⁄«œ… ﬂ «»… ﬂ·„… «·„—Ê— €Ì— ’ÕÌÕ';
+  MsgText2 = 'ﬂ·„… «·„—Ê— ·«  ﬁ· ⁄‰ 4 Õ—Ê›';
+  MsgText3 = '«”„ «·œŒÊ·  ·«Ìﬁ· ⁄‰ 4 Õ—Ê—›';
+  MsgText4 = '«”„ «·⁄«∆·… ·« Ìﬁ· ⁄‰ 4 Õ—Ê›';
+  MsgText5 = '«”„ «·„” Œœ„  ·«Ìﬁ· ⁄‰ 4 Õ—Ê›';
+  MsgText6 = '”Ì€… «·≈„Ì· Œ«ÿ∆…' + #13 +
+    '„À«· :' + #13 +
+    'mohamed@yahoo.com' + #13 +
+    'ali@hotmail.com';
+  MsgText7 = '—ﬁ„ «·Â« › ·«Ìﬁ· ⁄‰ 9 √—ﬁ«„';
+  MsgText8 = ' √ﬂÌœ «·»—Ìœ «·≈·ﬂ —Ê‰Ì €Ì— ’ÕÌÕ';
+begin
+  if not (Length(Edit_Nam.Text) < 4) then
+  begin
+    if not (Length(Edit_Prenam.Text) < 4) then
+    begin
+      if (Email) or (Edit_Email.Text = '') then
+      begin
+        if (Edit_Email.Text = Edit_Email2.Text) or (Edit_Email.Text = '') then
+        begin
+          if not (Length(Edit_pseudonyme.Text) < 4) then
+          begin
+            if not (Length(Edit_Mot_Passe1.Text) < 6) then
+            begin
+              if Edit_Mot_Passe2.Text = Edit_Mot_Passe1.Text then
+              begin
+                UnitObjets_Active.User.Name := Edit_Nam.Text;
+                UnitObjets_Active.User.Prename := Edit_Prenam.Text;
+                UnitObjets_Active.User.Email := Edit_Email.Text;
+                UnitObjets_Active.User.pseudonyme := Edit_pseudonyme.Text;
+                UnitObjets_Active.User.Password := Edit_Mot_Passe2.Text;
+                Form_Welcoming.Notebook1.ActivePage := 'Page_Recording2';
+              end
+              else
+              begin
+                MessageBox(Application.Handle, PChar(MsgText1), PChar(MsgCaptionError), MB_OK + MsgType);
+                Form_Welcoming.ActiveControl := Edit_Mot_Passe1;
+              end;
+            end
+            else
+            begin
+              MessageBox(Application.Handle, PChar(MsgText2), PChar(MsgCaptionError), MB_OK + MsgType);
+              Form_Welcoming.ActiveControl := Edit_Mot_Passe1;
+            end;
+          end
+          else
+          begin
+            MessageBox(Application.Handle, PChar(MsgText3), PChar(MsgCaptionError), MB_OK + MsgType);
+            Form_Welcoming.ActiveControl := Edit_pseudonyme;
+          end;
+        end
+        else
+        begin
+          MessageBox(Application.Handle, PChar(MsgText8), PChar(MsgCaptionError), MB_OK + MsgType);
+          Form_Welcoming.ActiveControl := Edit_Email;
+        end;
+      end
+      else
+      begin
+        MessageBox(Application.Handle, PChar(MsgText6), PChar(MsgCaptionError), MB_OK + MsgType);
+        Form_Welcoming.ActiveControl := Edit_Email;
+      end;
+    end
+    else
+    begin
+      MessageBox(Application.Handle, PChar(MsgText4), PChar(MsgCaptionError), MB_OK + MsgType);
+      Form_Welcoming.ActiveControl := Edit_Prenam;
+    end;
+  end
+  else
+  begin
+    MessageBox(Application.Handle, PChar(MsgText5), PChar(MsgCaptionError), MB_OK + MsgType);
+    Form_Welcoming.ActiveControl := Edit_Nam;
+  end;
+end;
+
+procedure TFrame_Recording1.Edit_pseudonymeKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+  if (Length(TEdit(Sender).Text) = 0) and (CharNumber(Key)) then key := #0;
+  if CharTalisman(Key) or CharMath(Key) or CharSignText(Key) or (Key in [' ']) then
+  begin
+    key := #0;
+    Form_Welcoming.Label_Message.Left := TWinControl(Sender).Left + Form_Welcoming.Notebook1.Left + 8;
+    Form_Welcoming.Label_Message.Top := TWinControl(Sender).Top + 8 + 22;
+    Form_Welcoming.Label_Message.Visible := True;
+  end else Form_Welcoming.Label_Message.Visible := False;
+
+end;
+
+procedure TFrame_Recording1.Edit_Mot_Passe1KeyPress(Sender: TObject;
+  var Key: Char);
+begin
+  if CharArabic(Key) or CharFrenshe(Key) or CharTalisman(Key) or CharSignText(Key) or CharMath(Key) then
+  begin
+    key := #0;
+    Form_Welcoming.Label_Message.Left := TWinControl(Sender).Left + Form_Welcoming.Notebook1.Left + 8;
+    Form_Welcoming.Label_Message.Top := TWinControl(Sender).Top + 8 + 22;
+    Form_Welcoming.Label_Message.Visible := True;
+  end else Form_Welcoming.Label_Message.Visible := False;
+end;
+
+procedure TFrame_Recording1.Edit_NamKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+  if CharTalisman(Key) or CharMath(Key) or CharNumber(key) or CharSignText(key) then
+  begin
+    key := #0;
+    Form_Welcoming.Label_Message.Left := TWinControl(Sender).Left + Form_Welcoming.Notebook1.Left + 8;
+    Form_Welcoming.Label_Message.Top := TWinControl(Sender).Top + 8 + 22;
+    Form_Welcoming.Label_Message.Visible := True;
+  end else Form_Welcoming.Label_Message.Visible := False;
+end;
+
+procedure TFrame_Recording1.Edit_EmailKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+  if ((Length(TEdit(Sender).Text) = 0) and (CharNumber(Key))) or
+    CharArabic(Key) or CharFrenshe(Key) or CharTalisman(Key) or (key in [' ']) or CharMath(Key) or (CharSignText(Key) and not (key in ['@', '.'])) then
+  begin
+    key := #0;
+    Form_Welcoming.Label_Message.Left := TWinControl(Sender).Left + Form_Welcoming.Notebook1.Left + 8;
+    Form_Welcoming.Label_Message.Top := TWinControl(Sender).Top + 8 + 22;
+    Form_Welcoming.Label_Message.Visible := True;
+  end
+  else Form_Welcoming.Label_Message.Visible := False;
+end;
+
+procedure TFrame_Recording1.Edit_NamExit(Sender: TObject);
+begin
+  if Edit_Nam.Text <> '' then
+  begin
+    if (Length(Edit_Nam.Text) > 4) then
+    begin
+      ImageNam.Picture := Form_Welcoming.ImageTrue.Picture;
+    end
+    else
+    begin
+      ImageNam.Picture := Form_Welcoming.ImageFalse.Picture;
+    end;
+    ImageNam.Visible := True;
+  end
+  else ImageNam.Visible := False;
+end;
+
+procedure TFrame_Recording1.Edit_EmailExit(Sender: TObject);
+begin
+  if Edit_Email.Text <> '' then
+  begin
+    if Email then
+    begin
+      ImageEmail.Picture := Form_Welcoming.ImageTrue.Picture;
+    end
+    else
+    begin
+      ImageEmail.Picture := Form_Welcoming.ImageFalse.Picture;
+    end;
+    ImageEmail.Visible := True;
+  end
+  else ImageEmail.Visible := False;
+end;
+
+procedure TFrame_Recording1.Edit_Email2Exit(Sender: TObject);
+begin
+  if Edit_Email2.Text <> '' then
+  begin
+    if (Edit_Email.Text = Edit_Email2.Text) and Email then
+    begin
+      ImageEmail2.Picture := Form_Welcoming.ImageTrue.Picture;
+    end
+    else
+    begin
+      ImageEmail2.Picture := Form_Welcoming.ImageFalse.Picture;
+    end;
+    ImageEmail2.Visible := True;
+  end
+  else ImageEmail2.Visible := False;
+end;
+
+procedure TFrame_Recording1.Edit_pseudonymeExit(Sender: TObject);
+begin
+  if Edit_pseudonyme.Text <> '' then
+  begin
+    if (Length(Edit_pseudonyme.Text) > 4) then
+    begin
+      if not (TUser.UsernameExists(Edit_pseudonyme.Text, UnitObjets_Active.Connexion)) then
+      begin
+        ImageUsername.Picture := Form_Welcoming.ImageTrue.Picture;
+      end
+      else
+      begin
+        Form_Welcoming.Label_Message.Caption := ' ﬂ·„… «·œŒÊ· «· Ì √œŒ· Â« „ÕÃÊ“… ”«»ﬁ« €Ì— ﬂ·„… √Œ—Ï';
+      end;
+    end
+    else
+    begin
+      ImageUsername.Picture := Form_Welcoming.ImageFalse.Picture;
+    end;
+    ImageUsername.Visible := True;
+  end
+  else ImageUsername.Visible := False;
+end;
+
+procedure TFrame_Recording1.Edit_Mot_Passe1Exit(Sender: TObject);
+begin
+  if Edit_Mot_Passe1.Text <> '' then
+  begin
+    if Length(Edit_Mot_Passe1.Text) > 4 then
+    begin
+      ImagePassword.Picture := Form_Welcoming.ImageTrue.Picture;
+    end
+    else
+    begin
+      ImagePassword.Picture := Form_Welcoming.ImageFalse.Picture;
+    end;
+    ImagePassword.Visible := True;
+  end
+  else ImagePassword.Visible := False;
+end;
+
+procedure TFrame_Recording1.Edit_PrenamExit(Sender: TObject);
+begin
+  if Edit_Prenam.Text <> '' then
+  begin
+    if (Length(Edit_Prenam.Text) > 4) then
+    begin
+      ImagePrenam.Picture := Form_Welcoming.ImageTrue.Picture;
+    end
+    else
+    begin
+      ImagePrenam.Picture := Form_Welcoming.ImageFalse.Picture;
+    end;
+    ImagePrenam.Visible := True;
+  end
+  else ImagePrenam.Visible := False;
+end;
+
+procedure TFrame_Recording1.Edit_Mot_Passe2Exit(Sender: TObject);
+begin
+  if Edit_Mot_Passe2.Text <> '' then
+  begin
+    if (Edit_Mot_Passe2.Text = Edit_Mot_Passe1.Text) and (Length(Edit_Mot_Passe1.Text) > 4) then
+    begin
+      ImagePassword2.Picture := Form_Welcoming.ImageTrue.Picture;
+    end
+    else
+    begin
+      ImagePassword2.Picture := Form_Welcoming.ImageFalse.Picture;
+    end;
+    ImagePassword2.Visible := True;
+  end
+  else ImagePassword2.Visible := False;
+end;
+
+procedure TFrame_Recording1.Prior;
+begin
+  Form_Welcoming.Notebook1.ActivePage := 'Page_Password';
+  Form_Welcoming.Button_Prior.Enabled := False;
+end;
+
+end.

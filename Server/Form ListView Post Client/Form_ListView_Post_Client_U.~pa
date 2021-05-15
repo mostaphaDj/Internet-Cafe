@@ -1,0 +1,177 @@
+unit Form_ListView_Post_Client_U;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ShellAPI, ExtCtrls, ComCtrls, ImgList, IdBaseComponent,
+  IdComponent, IdTCPServer, Menus, StdCtrls, IdAntiFreezeBase, IdAntiFreeze,
+  ToolWin, ActnMan, ActnCtrls;
+
+type
+  TForm_ListView_Post_Client = class(TForm)
+    ListView1: TListView;
+    PopupMenuPost: TPopupMenu;
+    Active: TMenuItem;
+    ActivePartTime1: TMenuItem;
+    DesActive1: TMenuItem;
+    Restart: TMenuItem;
+    ShutDown1: TMenuItem;
+    PopupMenuListViewShowPost: TPopupMenu;
+    View2: TMenuItem;
+    ViewStyleChange1: TMenuItem;
+    ViewStyleChange2: TMenuItem;
+    btnList: TMenuItem;
+    ViewStyleChange4: TMenuItem;
+    Chonge1: TMenuItem;
+    Payment: TMenuItem;
+    TimerPayment: TTimer;
+    Refresh: TMenuItem;
+    Now1: TMenuItem;
+    Hide1: TMenuItem;
+    HidePostX1: TMenuItem;
+    N1: TMenuItem;
+    ToolBar1: TToolBar;
+    ToolButton1: TToolButton;
+    ToolButton2: TToolButton;
+    ToolButton3: TToolButton;
+    ToolButton4: TToolButton;
+    ToolButton5: TToolButton;
+    ToolButton6: TToolButton;
+    ToolButton7: TToolButton;
+    ToolButton8: TToolButton;
+    procedure ListView1ContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
+    procedure ViewStyleChange1Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ListView1DblClick(Sender: TObject);
+    procedure ListView1SelectItem(Sender: TObject; Item: TListItem;
+      Selected: Boolean);
+    procedure ListView1Resize(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure TimerPaymentTimer(Sender: TObject);
+  private
+    { Déclarations privées }
+  public
+    { Déclarations publiques }
+  end;
+
+var
+  Form_ListView_Post_Client: TForm_ListView_Post_Client;
+
+implementation
+
+uses IdTCPConnection, Connexion_Module_U,
+  Action_Module_U, Form_Main_U, Type_U, Data_Module_ImageList_U,
+  User_Concerted_U, Classes_U;
+
+{$R *.dfm}
+
+procedure TForm_ListView_Post_Client.ListView1ContextPopup(Sender: TObject;
+  MousePos: TPoint; var Handled: Boolean);
+begin
+  if ListView1.Selected <> nil then
+  begin
+    ListView1.PopupMenu := PopupMenuPost;
+  end
+  else
+  begin
+    ListView1.PopupMenu := PopupMenuListViewShowPost;
+  end;
+end;
+
+procedure TForm_ListView_Post_Client.ViewStyleChange1Click(Sender: TObject);
+begin
+  ListView1.ViewStyle := TViewStyle((Sender as TComponent).Tag);
+end;
+
+procedure TForm_ListView_Post_Client.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  FreeAndNil(Self);
+end;
+
+procedure TForm_ListView_Post_Client.ListView1DblClick(Sender: TObject);
+begin
+  if ListView1.Selected <> nil then
+    Action_Module.UnLockExecute(Sender);
+end;
+
+procedure TForm_ListView_Post_Client.ListView1SelectItem(Sender: TObject;
+  Item: TListItem; Selected: Boolean);
+begin
+  if Selected then
+  begin
+    UnitObjets_Active := TUnitObjets(ListView1.Selected.Data);
+    ToolBar1.Visible := True;
+    if (UnitObjets_Active.Connexion.StateConnect >= scUnbeknownDisconnect)
+      or (UnitObjets_Active.Connexion.StateConnect >= scShutDown)
+      or (UnitObjets_Active.Connexion.StateConnect >= scReturn) then
+      ActionDisabled
+    else
+    begin
+      if UnitObjets_Active.Use = nil then
+      begin
+        ActionEnabledLock;
+      end
+      else
+      begin
+        case UnitObjets_Active.Use.State of
+          suUsageTimeUnlimited: ActionEnabledUnlimited;
+          suUsageTimelimited: ActionEnabledTimelimited;
+          suSuspend: ActionEnabledSuspend;
+        end;
+      end;
+    end;
+  end
+  else
+  begin
+    ToolBar1.Visible := False;
+    if Action_Module <> nil then
+    begin
+      Action_Module.UnLock.Enabled := False;
+      Action_Module.UnLockPartTime.Enabled := False;
+      Action_Module.LockPayment.Enabled := False;
+      Action_Module.LockCancel.Enabled := False;
+      Action_Module.Change_Use.Enabled := False;
+      Action_Module.Restart.Enabled := False;
+      Action_Module.ShutDown.Enabled := False;
+    end;
+    UnitObjets_Active := nil;
+  end;
+end;
+
+procedure TForm_ListView_Post_Client.ListView1Resize(Sender: TObject);
+begin
+  ListView1.Refresh;
+end;
+
+procedure TForm_ListView_Post_Client.FormCreate(Sender: TObject);
+begin
+  Connexion_Module := TConnexion_Module.Create(Self);
+end;
+
+procedure TForm_ListView_Post_Client.TimerPaymentTimer(Sender: TObject);
+var
+  PostIndex: Integer;
+begin
+  with ListView1.Items do
+  begin
+    for PostIndex := 0 to Count - 1 do
+    begin
+      if TUnitObjets(Item[PostIndex].Data).Use <> nil then
+      begin
+        if (TUnitObjets(Item[PostIndex].Data).Use.State = suUsageTimelimited)
+          or (TUnitObjets(Item[PostIndex].Data).Use.State = suUsageTimeUnlimited) then
+        begin
+          TUnitObjets(Item[PostIndex].Data).Use.TimeUtilize := Now -
+            TUnitObjets(Item[PostIndex].Data).Use.TimeStart;
+          Item[PostIndex].SubItems.Insert(2, TimeToStr(TUnitObjets(Item[PostIndex].Data).Use.TimeUtilize));
+        end;
+      end;
+    end;
+  end;
+
+end;
+
+end.

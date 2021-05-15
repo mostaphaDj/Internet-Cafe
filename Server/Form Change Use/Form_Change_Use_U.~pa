@@ -1,0 +1,50 @@
+unit Form_Change_Use_U;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ComCtrls;
+
+type
+  TForm_Change_Use = class(TForm)
+    ListView1: TListView;
+    Button_Ok: TButton;
+    Button_Cancel: TButton;
+    procedure FormCreate(Sender: TObject);
+  private
+    { Déclarations privées }
+  public
+    { Déclarations publiques }
+  end;
+
+var
+  Form_Change_Use: TForm_Change_Use;
+
+implementation
+
+uses Form_ListView_Post_Client_U, Type_U, Classes_U;
+
+{$R *.dfm}
+
+procedure TForm_Change_Use.FormCreate(Sender: TObject);
+var
+  PostIndex: Integer;
+begin
+  for PostIndex := 0 to Form_ListView_Post_Client.ListView1.Items.Count - 1 do
+  begin
+    if TUnitObjets(Form_ListView_Post_Client.ListView1.Items.Item[PostIndex].Data).Use <> nil then
+    begin
+      if (TUnitObjets(Form_ListView_Post_Client.ListView1.Items.Item[PostIndex].Data).Use.State = suUsageTimeUnlimited) and
+        (TUnitObjets(Form_ListView_Post_Client.ListView1.Items.Item[PostIndex].Data).Connexion.StateConnect = scConnected) then
+      begin
+        ListView1.Items.AddItem(Form_ListView_Post_Client.ListView1.Items.Item[PostIndex]);
+      end;
+    end;
+
+
+  end;
+
+end;
+
+end.

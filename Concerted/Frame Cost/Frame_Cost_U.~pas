@@ -1,0 +1,206 @@
+unit Frame_Cost_U;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ExtCtrls,
+  Type_U, Grids, ValEdit;
+
+type
+  TFrame_Cost = class(TFrame)
+    Panel10: TPanel;
+    Label3: TLabel;
+    Label_Totale: TLabel;
+    Timer1: TTimer;
+    ValueListEditor1: TValueListEditor;
+    Panel3: TPanel;
+    Label_pseudonyme_User: TLabel;
+    Label_HostName_PC: TLabel;
+    Label7: TLabel;
+    Label9: TLabel;
+    Label1: TLabel;
+    Label_Prename_User: TLabel;
+    Label6: TLabel;
+    Label_name_User: TLabel;
+    procedure Timer1Timer(Sender: TObject);
+    procedure Panel10Click(Sender: TObject);
+    procedure Panel11MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure Panel11MouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure ValueListEditor1EditButtonClick(Sender: TObject);
+  private
+    { Private declarations }
+
+  public
+    { Public declarations }
+    Monition:Boolean;
+    constructor Create(AOwner: TComponent); override;
+  end;
+
+var
+  Frame_Cost: TFrame_Cost;
+
+implementation
+
+
+
+uses DateUtils, Form_Monition_U, Classes_U, Form_Limitation_Time_U;
+
+{$R *.dfm}
+
+procedure TFrame_Cost.Panel10Click(Sender: TObject);
+begin
+  if Panel10.BevelOuter = bvRaised then
+  begin
+    Panel10.BevelOuter := bvLowered;
+    Panel10.BevelInner := bvLowered;
+    ValueListEditor1.Visible := True;
+  end
+  else
+  begin
+    Panel10.BevelOuter := bvRaised;
+    Panel10.BevelInner := bvRaised;
+    ValueListEditor1.Visible := False;
+  end;
+
+end;
+
+procedure TFrame_Cost.Panel11MouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  TPanel(Sender).BevelInner := bvLowered;
+  TPanel(Sender).BevelOuter := bvLowered;
+end;
+
+procedure TFrame_Cost.Panel11MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  TPanel(Sender).BevelInner := bvRaised;
+  TPanel(Sender).BevelOuter := bvRaised;
+end;
+
+procedure TFrame_Cost.Timer1Timer(Sender: TObject);
+begin
+  with ValueListEditor1 do
+  begin
+    Values['TimeNow'] := TimeToStr(Now);
+    Values['TimeUtilize'] := TimeToStr(UnitObjets_Active.Use.TimeUtilize);
+    Values['Cost'] := CurrToStr(UnitObjets_Active.Use.Cost);
+  end;
+  Label_Totale.Caption := CurrToStr(UnitObjets_Active.Use.Cost - UnitObjets_Active.User.Computation); {„»€ «·œ›⁄⁄ „»·€ Â–Â «·Ã·”… + «·œÌ‰}
+
+  if Monition and (UnitObjets_Active.Use.State=suTimelimited)and(CompareDateTime(UnitObjets_Active.Use.TimeFinVirtual - StrToTime('00:05:00'), Now)=-1) then
+  begin
+    Form_Monition := TForm_Monition.Create(Application);
+    Form_Monition.Show;
+    Monition := False;
+  end;
+
+  if Form_Monition<>nil then
+  begin
+    Form_Monition.Label_Time.Caption:=TimeToStr(UnitObjets_Active.Use.TimeFinVirtual-Now);
+  end;
+
+  if (UnitObjets_Active.Use.State=suTimelimited)and(CompareDateTime(UnitObjets_Active.Use.TimeFinVirtual,Now)=-1) then
+  begin
+   UnitObjets_Active.Use.Terminate;
+  end;
+
+end;
+
+constructor TFrame_Cost.Create(AOwner: TComponent);
+var
+  i: Byte;
+begin
+  inherited;
+  Label_HostName_PC.Caption := UnitObjets_Active.Post_Client.HostName;
+  Label_pseudonyme_User.Caption := UnitObjets_Active.User.pseudonyme;
+  Label_Prename_User.Caption := UnitObjets_Active.User.Prename;
+  Label_name_User.Caption := UnitObjets_Active.User.Name;
+  with ValueListEditor1 do
+  begin
+    Values['TimeStart'] := TimeToStr(UnitObjets_Active.Use.TimeStart);
+    Values['TimeNow'] := TimeToStr(Now);
+    if UnitObjets_Active.Use.State = suTimeUnlimited then
+    begin
+      Values['TimeDesired'] := '√‰ﬁ— Â‰« ·· ÕœÌœ';
+      Values['TimeFinVirtual'] := '√‰ﬁ— Â‰« ·· ÕœÌœ';
+      Values['CostVirtual'] := '√‰ﬁ— Â‰« ·· ÕœÌœ';
+    end
+    else
+    begin
+      Values['TimeDesired'] := TimeToStr(UnitObjets_Active.Use.TimeDesired);
+      Values['TimeFinVirtual'] := TimeToStr(UnitObjets_Active.Use.TimeFinVirtual);
+      Values['CostVirtual'] := CurrToStr(UnitObjets_Active.Use.CostVirtual);
+    end;
+    Values['PriceHour'] := CurrToStr(UnitObjets_Active.Use.PriceHour);
+    Values['Cost'] := CurrToStr(UnitObjets_Active.Use.Cost);
+    Values['Computation'] := CurrToStr(UnitObjets_Active.Use.User.Computation);
+//******************************************************************************
+    ItemProps[3].EditStyle := esEllipsis;
+    ItemProps[4].EditStyle := esEllipsis;
+    ItemProps[5].EditStyle := esEllipsis;
+  end;
+
+  if UnitObjets_Active.User.Computation - UnitObjets_Active.Use.Cost < 0 then
+  begin
+    Label3.Caption := '»ﬁÌ ›Ì —’Ìœﬂ';
+  end
+  else
+  begin
+    Label3.Caption := '«·„»·€ «·≈Ã„«·Ì';
+  end;
+  for i := 0 to 7 do //   · ﬂÊ‰ Ã„Ì⁄ «·›« ÌÕ ··ﬂ «»… ›ﬁÿ
+  begin
+    with ValueListEditor1.ItemProps[i] do
+    begin
+      ReadOnly := true;
+    end;
+  end;
+  Timer1Timer(nil);
+  Timer1.Enabled := True;
+  Monition := True;
+end;
+
+procedure TFrame_Cost.ValueListEditor1EditButtonClick(Sender: TObject);
+begin
+  Form_Limitation_Time := TForm_Limitation_Time.Create(Application);
+  with Form_Limitation_Time.Frame_Limitation_Time do
+  begin
+    if UnitObjets_Active.Use.State = suTimelimited then
+    begin
+      DateTimePicker_TimeFinVirtual.DateTime := UnitObjets_Active.Use.TimeFinVirtual;
+      DateTimePicker_TimeDesired.DateTime := UnitObjets_Active.Use.TimeDesired;
+      Edit_Cost.Text := CurrToStr(UnitObjets_Active.Use.CostVirtual);
+    end
+  end;
+//*****************************************************************************
+  if Form_Limitation_Time.ShowModal = mrok then
+  begin
+//    if Form_Limitation_Time.Frame_Limitation_Time.RadioButton1.Checked then
+//    begin
+    if UnitObjets_Active.Use.State = suTimelimited then
+    begin
+      with Frame_Cost.ValueListEditor1 do
+      begin
+        Values['TimeDesired'] := TimeToStr(UnitObjets_Active.Use.TimeDesired);
+        Values['TimeFinVirtual'] := TimeToStr(UnitObjets_Active.Use.TimeFinVirtual);
+        Values['CostVirtual'] := CurrToStr(UnitObjets_Active.Use.CostVirtual);
+      end;
+    end
+    else
+    begin
+      with Frame_Cost.ValueListEditor1 do
+      begin
+        Values['TimeDesired'] := '√‰ﬁ— Â‰« ·· ÕœÌœ';
+        Values['TimeFinVirtual'] := '√‰ﬁ— Â‰« ·· ÕœÌœ';
+        Values['CostVirtual'] := '√‰ﬁ— Â‰« ·· ÕœÌœ';
+      end;
+    end;
+  end;
+  Form_Limitation_Time.Free;
+end;
+end.
+

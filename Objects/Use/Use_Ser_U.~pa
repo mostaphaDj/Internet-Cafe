@@ -1,0 +1,269 @@
+unit Use_Ser_U;
+
+interface
+
+uses
+  Windows, Forms, DateUtils,
+  Use_Concerted_U, User_Concerted_U, User_Ser_U, Post_Client_Concerted_U, Post_Client_Ser_U, ADODB;
+
+type
+  TUse_Ser = class(TUse_Concerted)
+  private
+//    procedure Change_Use_For;override;
+  public
+    constructor Create(VPost_Client: TPost_Client_Concerted; VUser: TUser_Concerted; VUnitObjects: TObject); override;
+    procedure Start; override; //  «‰ÿ·«ﬁ
+    procedure Suspend; override; //  ÌÊﬁ› „ƒﬁ «
+    procedure Resume; override; //  Ì” √‰›
+    procedure StopAndCancel; override; // ≈·€«¡ «·Ã·”…
+    procedure Terminate; override; //  Ì‰ÂÏ
+//    procedure Change_Post(PCCourse {«·ÊÃÂ…}: TPost_Client_Ser); //  override; //   €ÌÌ— «·Õ«”Ê»
+//    procedure Change_Use_To(ForPC: TPost_Client_Ser);
+    destructor Destroy; override; //  Õ—Ì— „⁄ «·Õ›÷
+  end;
+
+implementation
+
+uses SysUtils,
+  Action_Module_U, Type_U, Data_Module_U, Classes_U;
+
+{ TUse }
+
+constructor TUse_Ser.Create(VPost_Client: TPost_Client_Concerted; VUser: TUser_Concerted; VUnitObjects: TObject); // CreateUnLock
+resourcestring
+  String_MessageUseCreate = ' ⁄–— »œ√ «·Ã·”… Œÿ√ ›Ì «·« ’«·';
+var
+  VRecordUse: TRecordUse;
+  VRecordRound: TRecordRound;
+begin
+  inherited;
+//***************** · ÕœÌœ ”⁄— «·Ã·”… ********************************
+  with Data_Module do
+  begin
+    Table_Rate.Locate('NameRate', FUser.Rate, []);
+    FPriceHour := Table_RatePriceHour.Value;
+  end;
+
+//*******************  · Œ“Ì‰ «·Ã·”… «·ÃœÌœ… ›Ì ﬁÊ«⁄œ «·„⁄ÿÌ«…
+  with Data_Module do
+  begin
+    Table_Use.Insert;
+    Table_UsepseudonymeUser.Value := FUser.pseudonyme;
+    Table_UseHostName.Value := FPost_Client.HostName;
+    Table_UseTimeStart.Value := TimeStart;
+    Table_UseTimeUse.Value := TimeUtilize;
+    Table_UseTimeFin.Value := TimeFin;
+    Table_UseCost.Value := Cost;
+    Table_UsePayment.Value := Payment;
+    Table_Use.Post;
+    N_Use := Table_Use.FieldByName('N_Use').AsInteger;
+  end;
+
+//*********************** Client  Ê≈—”«·  ÕﬁÊ· «·Ã·”… «·ÃœÌœ… › Õ  **********************************
+  with FConnexion.IdTCPClient do
+  begin
+    try
+      Writeln('CreateUse');
+      VRecordUse := RecordUse;
+      WriteBuffer(VRecordUse, SizeOf(VRecordUse), True);
+      VRecordRound := FRound.RecordRound;
+      WriteBuffer(VRecordRound, SizeOf(VRecordRound), True);
+      TUnitObjets(FUnitObjets).Change_ImageIndex;
+    except
+      on E: Exception do
+      begin
+        MessageBox(Application.Handle, PChar(String_MessageUseCreate + #13 + E.Message),
+          PChar(MsgCaptionError), $180000);
+      end;
+    end;
+  end;
+
+end;
+
+
+destructor TUse_Ser.Destroy;
+begin
+  inherited Destroy;
+end;
+
+procedure TUse_Ser.Resume;
+begin
+  inherited;
+
+end;
+
+procedure TUse_Ser.Start;
+resourcestring
+  String_MessageUseStart = ' ⁄–— »œ√ «·Ã·”… Œÿ√ ›Ì «·« ’«·';
+begin
+  inherited;
+  TimeStart := Now; // ·· ’ÕÌÕ ·«Õﬁ«
+  with FConnexion.IdTCPClient do
+  begin
+    try
+      Writeln('Start');
+      ActionEnabledUnlimited;
+      TUnitObjets(FUnitObjets).Change_ImageIndex;
+    except
+      on E: Exception do
+      begin
+        MessageBox(Application.Handle, PChar(String_MessageUseStart + #13 + E.Message),
+          PChar(MsgType), $180000);
+      end;
+    end;
+  end;
+end;
+
+procedure TUse_Ser.StopAndCancel;
+resourcestring
+  MsgText = 'ÕœÀ Œÿ√ ⁄‰œ „Õ«Ê·… «·≈€·«ﬁ';
+begin
+  inherited;
+  with Data_Module do
+  begin
+    Table_Use.Locate('N_Use', N_Use, []);
+    Table_Use.Delete;
+  end;
+//*****************************************************************************
+  begin
+    with FConnexion.IdTCPClient do
+    begin
+      try
+        Writeln('StopAndCancel');
+        WriteInteger(MinuteOfTheDay(Cost));
+        ActionEnabledLock;
+  //    FState := suLock;
+        TUnitObjets(FUnitObjets).Change_ImageIndex;
+        FreeAndNil(Self);
+//        TUnitObjets(FUnitObjets).User.Free;
+      except
+        on E: Exception do
+        begin
+          MessageBox(Application.Handle, PChar(MsgText + #13 +
+            E.Message), PChar(MsgCaptionError), MB_OK + MsgType);
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TUse_Ser.Suspend;
+begin
+  inherited;
+
+end;
+
+procedure TUse_Ser.Terminate;
+resourcestring
+  MsgText = 'ÕœÀ Œÿ√ ⁄‰œ „Õ«Ê·… «·≈€·«ﬁ';
+begin
+  inherited;
+  with Data_Module do
+  begin
+    Table_Use.Locate('N_Use', N_Use, []);
+    Table_Use.Edit;
+    Table_UseTimeFin.Value := TimeFin;
+    Table_UseCost.Value := Cost;
+    Table_UsePayment.Value := Payment;
+    Table_Use.Post;
+  end;
+
+//******************************************************************************
+  with FConnexion.IdTCPClient do
+  begin
+    try
+      Writeln('Terminate');
+      WriteInteger(MinuteOfTheDay(Cost));
+      ActionEnabledLock;
+  //    FState := suLock;
+      TUnitObjets(FUnitObjets).Change_ImageIndex;
+      TUnitObjets(FUnitObjets).Use := nil;
+      FreeAndNil(Self);
+    except
+      on E: Exception do
+      begin
+        MessageBox(Application.Handle, PChar(MsgText + #13 +
+          E.Message), PChar(MsgCaptionError), MB_OK + MsgType);
+      end;
+    end;
+  end;
+end;
+
+(*
+procedure TUse_Ser.Change_Post(PCCourse {«·ÊÃÂ…}: TPost_Client_Ser); //   €ÌÌ— «·Õ«”Ê»
+begin
+  //PCCourse.Change_Use_To();
+  Change_Use_For;
+end;
+
+//****************************     Change_Use_To   ***************
+
+procedure TUse_Ser.Change_Use_To(ForPC: TPost_Client_Ser);
+resourcestring
+  MsgText = 'ÕœÀ Œÿ√ ⁄‰œ «·«—”«· ··ﬂ„»ÌÊ — «·ÊÃÂ…';
+begin
+(*
+  with FPost_Client.IdTCPClient do
+  begin
+    try
+      Writeln('Change_Use_To');
+      WriteLn(TUse(ForPC.Use).User.pseudonyme);
+      FUse := TObject(ForPC.Use);
+//**************************************************
+      Data_Module.Table_Use.Locate('N_Use', FUse.N_Use, []);
+      Data_Module.Table_Use.Edit;
+      Data_Module.Table_UseHostName.Value := FHostName;
+      Data_Module.Table_Use.Post;
+      Data_Module.Table_Use.Close;
+//**************************************************
+
+      FStateUse := ForPC.StateUse;
+
+      with FUse do
+      begin
+//*************************************************
+        WriteInteger(N_Use);
+//        Write(CostHour);  ·· ’ÕÌÕ ·«Õﬁ«
+        WriteLn(dateTimeToStr(TimeStart));
+        WriteLn(dateTimeToStr(TimeUtilize));
+//*************************************************
+        ActionEnabledUnLock;
+        Change_ImageIndex;
+      end;
+    except
+      on E: Exception do
+      begin
+      MessageBox(Application.Handle, PChar(MsgText+ #13 +
+          E.Message), PChar(MsgCaptionError), MB_OK+MsgType);
+      end;
+    end;
+  end;
+end;   *)
+
+{procedure TUse_Ser.Change_Use_For;
+resourcestring
+  MsgText = '';
+begin
+  inherited;
+
+  with FPost_Client.IdTCPClient do
+  begin
+    try
+      Writeln('Change_Use_For');
+      FUse := nil;
+      FStateUse := suLock;
+      Change_ImageIndex;
+      ActionEnabledLock;
+
+    except
+      on E: Exception do
+      begin
+      MessageBox(Application.Handle, PChar(MsgText+ #13 +
+          E.Message), PChar(MsgCaptionError), MB_OK+MsgType);
+      end;
+    end;
+
+  end;
+end;   }
+
+end.

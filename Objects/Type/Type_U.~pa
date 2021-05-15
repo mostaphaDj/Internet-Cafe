@@ -1,0 +1,83 @@
+unit Type_U;
+
+interface
+
+uses Windows;
+
+type
+  TStateUse = (suUsageTimeUnlimited {æŞÊ ÛíÑ ãÍÏæÏ}, suUsageTimelimited {æŞÊ ãÍÏÏ}, suSuspend {ÊæŞİ ãÄŞÊ}); // ÍÇáÉ ÇáÌáÓÉ
+  TStatePost_Client = (spLock {ãÛáŞ}, spUnLock {ãİÊæÍ});
+  TStateConnect = (scConnected {ãÊÕá}, scUnbeknownDisconnect {ÇäŞØÇÚ ãÌåæá}, scShutDown, scReturn, OutsideDomaine {ÎÇÑÌ ãÌÇá ÇáÊÍßã æÇáÅÊÕÇá}); // æÖÚíÉ ÇáÅÊÕÇá
+  TStatePostCliont = (spcUsed {ãÓÊÚãá}, spcUnUsed {ÛíÑ ãÓÊÚãá}); //  ÍÇáÉ ÇáÇÓÊÚãÇá
+
+  TRecordUser = packed record
+    pseudonyme: string[250]; // ÅÓã  ÇáÏÎæá
+    Prename: string[250]; // ÅÓã ÇáãÓÊÚãá
+    Name: string[250]; // ÅÓã ÇáÚÆáÉ
+    Sexe: string[250]; // ÇáÌäÓ
+    Password: string[250]; // ßáãÉ ÇáãÑæÑ
+    N_Carte: Integer; //   ÑŞã ÈØÇŞÉ ÇáÊÚÑíİ ÇáæØäí
+    Email: string[250]; //  ÇáÈÑíÏ ÇáÅáßÊÑæäí
+    Adresse: string[250]; //  ÇáÚäæÇä
+    DateNescience: TDateTime; //  ÊÇÑíÎ ÇáãíáÇÏ
+    Computation: Currency; //  ÇáÑÕíÏ Ãæ ÇáÏíä
+    Rate: string[250]; // ÊÕäíİ ÇáÒÈæä
+    Date_Register: TDateTime; // ÊÇÑíÎ ÇáÊÓÌíá
+    N_mobile: Integer; // ÇáåÇÊİ ÇáÌæÇá
+    Niveau_Informatique: string[250]; //  ÇáæÓÊæì İí ÇáÅÚáÇã ÇáÂáí
+    Niveau_didacticism: string[250]; //  ÇáæÓÊæì İí ÇáÅÚáÇã ÇáÂáí
+    Vocation: string[250]; //   ÇáãåäÉ
+    Remark: string[250]; // ãáÇÍÖÉ Úä ÇáÒÈæä
+  end;
+
+  TRecordUse = packed record
+    N_Use: Integer; {ÑŞã ÇáÌáÓÉ}
+    Post_Client: TObject;
+    User: TObject; {ÇÓã ÇáãÓÊÎÏã}
+    CostHour: Currency; {Ëãä ÇáÓÇÚÉ}
+    TimeStart: TDateTime; //default Now;{æŞÊ ÈÏÁ ÇáÌáÓÉ}
+    TimeFin: TDateTime; // æŞÊ ÅäåÇÁ ÇáÌáÓÉ
+    TimeFinVirtual: TDateTime; // æŞÊ ÅäåÇÁ ÇáÌáÓÉ
+    TimeUtilize: TDateTime; //      {ÇáæŞÊ ÇáãÓÊÎÏã}
+    TimeDesired: TDateTime; //   ÇáæŞÊ ÇáãØáæÈ
+    CostVirtual: Currency; {ÇáãÈáÛ ÇáãİÊÑÖ}
+    Cost: Currency; {ÇáãÈáÛ}
+    State: TStateUse; {ÇáæÖÚíÉ}
+  end;
+
+  TRecordRound = packed record
+    Value: Currency; // ÇáãÈáÛ
+    ValueRound: Currency; // ÇáãÈáÛ ÇáãÑÌÍ
+    UnitRound: Currency; //ŞíãÉ ÇáÊÑÌíÍ
+    ValueNiveauRound: Currency; //ŞíãÉ ÇŞá ÍÓÇÑÉ
+    PercentageNiveauRound: Single; // äÓÈÉ ÃŞá ÎÓÇÑÉ
+  end;
+
+function StateUseToString(Value: TStateUse): string;
+function StringToStateUse(Value: string): TStateUse;
+
+const
+  MsgType: Integer = MB_ICONSTOP + MB_DEFBUTTON1 + MB_SYSTEMMODAL + MB_RIGHT + MB_RTLREADING;
+  MsgCaptionError = 'ÎØÃ';
+  MsgCaptionWarning = 'ÊÍĞíÑ';
+
+implementation
+
+function StateUseToString(Value: TStateUse): string;
+begin
+  case Value of
+    suUsageTimeUnlimited: Result := 'suUsageTimeOpen';
+    suUsageTimelimited: Result := 'suUsageTimeClose';
+    suSuspend: Result := 'suSuspend';
+  end;
+end;
+
+function StringToStateUse(Value: string): TStateUse;
+begin
+  if Value = 'suUsageTimeOpen' then Result := suUsageTimeUnlimited else
+    if Value = 'suUsageTimeClose' then Result := suUsageTimelimited else
+      if Value = 'suSuspend' then Result := suSuspend;
+end;
+
+
+end.

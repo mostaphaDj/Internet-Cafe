@@ -1,0 +1,71 @@
+unit Post_Client_Concerted_U;
+
+interface
+
+uses Forms, Classes,
+  Type_U, Connexion_Concerted_U;
+
+type
+  TPost_Client_Concerted = class(TObject)
+  private
+
+  protected
+    FUnitObjets: TObject;
+    FHostName: string;
+    FState: TStatePost_Client;
+    FConnexion: TConnexion_Concerted;
+  public
+    constructor Create; virtual;
+    procedure UnLock; virtual;
+    procedure Lock; virtual;
+    procedure Change_Use(PCWay: TPost_Client_Concerted); virtual;
+    procedure ShutDown; virtual;
+    procedure Restart; virtual;
+    property HostName: string read FHostName write FHostName;
+    property State: TStatePost_Client read FState write FState;
+    property Connexion: TConnexion_Concerted read FConnexion write FConnexion;
+    property UnitObjets: TObject read FUnitObjets write FUnitObjets;
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses Classes_U;
+
+constructor TPost_Client_Concerted.Create;
+begin
+
+end;
+
+destructor TPost_Client_Concerted.Destroy;
+begin
+  TUnitObjets(FUnitObjets).Post_Client := nil;
+  inherited;
+end;
+
+procedure TPost_Client_Concerted.Lock;
+begin
+  FState := spLock;
+end;
+
+procedure TPost_Client_Concerted.Restart;
+begin
+
+end;
+
+procedure TPost_Client_Concerted.ShutDown;
+begin
+
+end;
+
+procedure TPost_Client_Concerted.UnLock;
+begin
+  FState := spUnLock;
+end;
+
+procedure TPost_Client_Concerted.Change_Use(PCWay: TPost_Client_Concerted);
+begin
+
+end;
+
+end.

@@ -1,0 +1,117 @@
+unit Form_Welcoming_U;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, StdCtrls, ComCtrls,
+  jpeg, Frame_Password_U, Frame_Recording3_U, Frame_Recording2_U,
+  Frame_Recording1_U, Frame_Limitation_Time_U,
+  Frame_Demand_Use_U, Buttons;
+
+type
+  TForm_Welcoming = class(TForm)
+    Notebook1: TNotebook;
+    Button_Next: TBitBtn;
+    Button_Cancel: TBitBtn;
+    Label_Message: TStaticText;
+    Image4: TImage;
+    Frame_Recording3: TFrame_Recording3;
+    Frame_Demand_Use: TFrame_Demand_Use;
+    Bevel1: TBevel;
+    Image1: TImage;
+    Frame_Limitation_Time: TFrame_Limitation_Time;
+    Button_Prior: TBitBtn;
+    Frame_Recording1: TFrame_Recording1;
+    ImageFalse: TImage;
+    ImageTrue: TImage;
+    Frame_Recording2: TFrame_Recording2;
+    Frame_Password: TFrame_Password;
+    procedure Button_PriorClick(Sender: TObject);
+    procedure Button_NextClick(Sender: TObject);
+    procedure Notebook1PageChanged(Sender: TObject);
+    procedure Button_CancelClick(Sender: TObject);
+  private
+    { Déclarations privées }
+  public
+    { Déclarations publiques }
+  end;
+
+var
+  Form_Welcoming: TForm_Welcoming;
+
+implementation
+
+uses Connexion_Module_U, Type_U, Classes_U;
+
+{$R *.dfm}
+
+procedure TForm_Welcoming.Button_PriorClick(Sender: TObject);
+begin
+  if Notebook1.ActivePage = 'Page_Recording1' then Frame_Recording1.Prior else
+    if Notebook1.ActivePage = 'Page_Recording2' then Frame_Recording2.Prior else
+      if Notebook1.ActivePage = 'Page_Recording3' then Frame_Recording3.Prior else
+        if Notebook1.ActivePage = 'Page_Limitation_Time' then Frame_Limitation_Time.Prior else
+end;
+
+procedure TForm_Welcoming.Button_NextClick(Sender: TObject);
+begin
+  if Notebook1.ActivePage = 'Page_Password' then Frame_Password.Next else
+    if Notebook1.ActivePage = 'Page_Recording1' then Frame_Recording1.Next else
+      if Notebook1.ActivePage = 'Page_Recording2' then Frame_Recording2.Next else
+        if Notebook1.ActivePage = 'Page_Recording3' then Frame_Recording3.Next else
+          if Notebook1.ActivePage = 'Page_Limitation_Time' then Frame_Limitation_Time.Start else
+end;
+
+procedure TForm_Welcoming.Notebook1PageChanged(Sender: TObject);
+begin
+  if Notebook1.ActivePage = 'Page_Password' then
+  begin
+    //Form_Welcoming.ActiveControl := Frame_Password.Edit_Entere_pseudonyme;
+    Form_Welcoming.Button_Prior.Enabled := False;
+    Form_Welcoming.Button_Next.Enabled := True;
+  end
+  else
+    if Notebook1.ActivePage = 'Page_Recording1' then
+    begin
+      //Form_Welcoming.ActiveControl := Frame_Recording1.Edit_Nam;
+      Form_Welcoming.Button_Prior.Enabled := True;
+      Form_Welcoming.Button_Next.Enabled := True;
+    end
+    else
+      if Notebook1.ActivePage = 'Page_Recording2' then
+      begin
+        //Form_Welcoming.ActiveControl := Frame_Recording2.DateTimePicker_Date_DateNescience;
+        Form_Welcoming.Button_Prior.Enabled := True;
+        Form_Welcoming.Button_Next.Enabled := True;
+      end
+      else
+        if Notebook1.ActivePage = 'Page_Recording3' then
+        begin
+          //Form_Welcoming.ActiveControl := Form_Welcoming.Button_Next;
+          Form_Welcoming.Button_Prior.Enabled := False;
+          Form_Welcoming.Button_Next.Enabled := True;
+        end
+        else
+          if Notebook1.ActivePage = 'Page_Limitation_Time' then
+          begin
+            //Form_Welcoming.ActiveControl := Frame_Limitation_Time.DateTimePicker_TimeDesired;
+            Form_Welcoming.Button_Prior.Enabled := True;
+            Form_Welcoming.Button_Next.Enabled := True;
+          end
+          else
+            if Notebook1.ActivePage = 'Page_Demand_Use' then
+            begin
+              Form_Welcoming.Button_Prior.Enabled := False;
+              Form_Welcoming.Button_Next.Enabled := False;
+            end;
+end;
+
+procedure TForm_Welcoming.Button_CancelClick(Sender: TObject);
+begin
+  UnitObjets_Active.Use.Free;
+  UnitObjets_Active.User.Free;
+  ModalResult := mrCancel;
+end;
+
+end.
